@@ -58,7 +58,7 @@ row before the </tbody></table> line.
 
  [Uber](https://www.uber.com/) 是一家美國矽谷的科技公司，同時也是 Go 語言的早期 adoptor。它開源了許多 golang 相關的專案，像是 Gopher 圈熟知的 [zap](https://github.com/uber-go/zap)、[jaeger](https://github.com/jaegertracing/jaeger) 等。2018 年年末 Uber 將內部的 [Go 語言撰寫規範](https://github.com/uber-go/guide) 開源到 GitHub 上，經過一年多的累積與貢獻，該規範已經初具規模，並且廣受 Gopher 們的關注。本文是該規範的繁體中文版本，內容會以原版為參考盡快更新。
 
-> 該專案參考並修改自 [uber-go/guide 的中文翻译](https://github.com/xxjwxc/uber_go_guide_cn)，在這邊感謝開源社群的貢獻，讓眾多開發者可以免費使用這些學習資源。
+> 該專案參考並修改自 [uber-go/guide 的中文翻譯](https://github.com/xxjwxc/uber_go_guide_cn)，在這邊感謝開源社群的貢獻，讓眾多開發者可以免費使用這些學習資源。
 
  ## 版本
 
@@ -71,116 +71,116 @@ row before the </tbody></table> line.
 - [English](#english)
 - [Uber Go 語言撰寫規範](#uber-go-語言撰寫規範)
 - [版本](#版本)
-- [目录](#目錄)
+- [目錄](#目錄)
 - [介绍](#介紹)
-- [指導準則](#指导原则)
-  - [指向 interface 的指针](#指向-interface-的指针)
-  - [Interface 合理性验证](#interface-合理性验证)
-  - [接收器 (receiver) 与接口](#接收器-receiver-与接口)
+- [指導準則](#指導準則)
+  - [指向 interface 的指標](#指向-interface-的指標)
+  - [Interface 合理性驗證](#interface-合理性驗證)
+  - [接收器 (receiver) 與介面](#接收器-receiver-與介面)
   - [零值 Mutex 是有效的](#零值-mutex-是有效的)
-  - [在边界处拷贝 Slices 和 Maps](#在边界处拷贝-slices-和-maps)
+  - [在邊界處複製 Slices 和 Maps](#在邊界處複製-slices-和-maps)
     - [接收 Slices 和 Maps](#接收-slices-和-maps)
     - [返回 slices 或 maps](#返回-slices-或-maps)
-  - [使用 defer 释放资源](#使用-defer-释放资源)
-  - [Channel 的 size 要么是 1，要么是无缓冲的](#channel-的-size-要么是-1要么是无缓冲的)
-  - [枚举从 1 开始](#枚举从-1-开始)
-  - [使用 time 处理时间](#使用-time-处理时间)
-    - [使用 `time.Time` 表达瞬时时间](#使用-timetime-表达瞬时时间)
-    - [使用 `time.Duration` 表达时间段](#使用-timeduration-表达时间段)
-    - [对外部系统使用 `time.Time` 和 `time.Duration`](#对外部系统使用-timetime-和-timeduration)
+  - [使用 defer 释放資源](#使用-defer-释放資源)
+  - [Channel 的 size 要麽是 1，不然就是無暫存的](#channel-的-size-要麽是-1不然就是無暫存的)
+  - [枚舉從 1 開始](#枚舉從-1-開始)
+  - [使用 time 處理時間](#使用-time-處理時間)
+    - [使用 `time.Time` 表達瞬時時間](#使用-timetime-表達瞬時時間)
+    - [使用 `time.Duration` 表達時間區段](#使用-timeduration-表達時間區段)
+    - [對外部系統使用 `time.Time` 和 `time.Duration`](#對外部系統使用-timetime-和-timeduration)
   - [Errors](#errors)
-    - [错误类型](#错误类型)
-    - [错误包装](#错误包装)
-    - [错误命名](#错误命名)
-  - [处理断言失败](#处理断言失败)
+    - [錯誤的類型](#錯誤的類型)
+    - [錯誤封裝](#錯誤封裝)
+    - [錯誤命名](#錯誤命名)
+  - [處理斷言失敗](#處理斷言失敗)
   - [不要使用 panic](#不要使用-panic)
   - [使用 go.uber.org/atomic](#使用-gouberorgatomic)
-  - [避免可变全局变量](#避免可变全局变量)
-  - [避免在公共结构中嵌入类型](#避免在公共结构中嵌入类型)
-  - [避免使用内置名称](#避免使用内置名称)
+  - [避免可變的全域變數](#避免可變的全域變數)
+  - [避免在公共結構中嵌入類型](#避免在公共結構中嵌入類型)
+  - [避免使用内置名稱](#避免使用内置名稱)
   - [避免使用 `init()`](#避免使用-init)
-  - [追加时优先指定切片容量](#追加时优先指定切片容量)
-  - [主函数退出方式 (Exit)](#主函数退出方式-exit)
+  - [追加時優先指定切片容量](#追加時優先指定切片容量)
+  - [主函數退出方式 (Exit)](#主函數退出方式-exit)
     - [一次性退出](#一次性退出)
-  - [在序列化结构中使用字段标记](#在序列化结构中使用字段标记)
+  - [在序列化結構中使用段落標記](#在序列化結構中使用段落標記)
 - [性能](#性能)
-  - [优先使用 strconv 而不是 fmt](#优先使用-strconv-而不是-fmt)
-  - [避免字符串到字节的转换](#避免字符串到字节的转换)
+  - [優先使用 strconv 而不是 fmt](#優先使用-strconv-而不是-fmt)
+  - [避免字串到字元的轉換](#避免字串到字元的轉換)
   - [指定容器容量](#指定容器容量)
     - [指定 Map 容量提示](#指定-map-容量提示)
     - [指定切片容量](#指定切片容量)
-- [规范](#规范)
-  - [避免过长的行](#避免过长的行)
+- [規範](#規範)
+  - [避免過長的行](#避免過長的行)
   - [一致性](#一致性)
-  - [相似的声明放在一组](#相似的声明放在一组)
+  - [相似的宣告放在一组](#相似的宣告放在一组)
   - [import 分组](#import-分组)
-  - [包名](#包名)
-  - [函数名](#函数名)
-  - [导入别名](#导入别名)
-  - [函数分组与顺序](#函数分组与顺序)
-  - [减少嵌套](#减少嵌套)
+  - [套件名稱](#套件名稱)
+  - [函數名](#函數名)
+  - [導入別名](#導入別名)
+  - [函數分组與顺序](#函數分组與顺序)
+  - [減少嵌套](#減少嵌套)
   - [不必要的 else](#不必要的-else)
-  - [顶层变量声明](#顶层变量声明)
-  - [对于未导出的顶层常量和变量，使用_作为前缀](#对于未导出的顶层常量和变量使用_作为前缀)
-  - [结构体中的嵌入](#结构体中的嵌入)
-  - [本地变量声明](#本地变量声明)
-  - [nil 是一个有效的 slice](#nil-是一个有效的-slice)
-  - [缩小变量作用域](#缩小变量作用域)
-  - [避免参数语义不明确 (Avoid Naked Parameters)](#避免参数语义不明确-avoid-naked-parameters)
-  - [使用原始字符串字面值，避免转义](#使用原始字符串字面值避免转义)
-  - [初始化结构体](#初始化结构体)
-    - [使用字段名初始化结构](#使用字段名初始化结构)
-    - [省略结构中的零值字段](#省略结构中的零值字段)
-    - [对零值结构使用 `var`](#对零值结构使用-var)
+  - [上層變數宣告](#上層變數宣告)
+  - [對於未導出的上層常數和變數，使用_作為前缀](#對於未導出的上層常數和變數使用_作為前缀)
+  - [結構體中的嵌入](#結構體中的嵌入)
+  - [本地變數宣告](#本地變數宣告)
+  - [nil 是一個有效的 slice](#nil-是一個有效的-slice)
+  - [缩小變數作用域](#缩小變數作用域)
+  - [避免参數語義不明確 (Avoid Naked Parameters)](#避免参數語義不明確-avoid-naked-parameters)
+  - [使用原始字串字面值，避免轉義](#使用原始字串字面值避免轉義)
+  - [初始化結構體](#初始化結構體)
+    - [使用段落名初始化結構](#使用段落名初始化結構)
+    - [省略結構中的零值段落](#省略結構中的零值段落)
+    - [對零值結構使用 `var`](#對零值結構使用-var)
     - [初始化 Struct 引用](#初始化-struct-引用)
   - [初始化 Maps](#初始化-maps)
-  - [字符串 string format](#字符串-string-format)
-  - [命名 Printf 样式的函数](#命名-printf-样式的函数)
+  - [字串 string format](#字串-string-format)
+  - [命名 Printf 樣式的函數](#命名-printf-樣式的函數)
 - [编程模式](#编程模式)
-  - [表驱动测试](#表驱动测试)
-  - [功能选项](#功能选项)
+  - [表驅動測試](#表驅動測試)
+  - [功能選項](#功能選項)
 - [Linting](#linting)
   - [Lint Runners](#lint-runners)
 - [Stargazers over time](#stargazers-over-time)
 
 ## 介绍
 
-样式 (style) 是支配我们代码的惯例。术语`样式`有点用词不当，因为这些约定涵盖的范围不限于由 gofmt 替我们处理的源文件格式。
+樣式 (style) 是支配我們程式碼的慣例。術語`樣式`有點用詞不當，因為這些约定涵蓋的範圍不限於由 gofmt 替我們處理的原始程式碼格式。
 
-本指南的目的是通过详细描述在 Uber 编写 Go 代码的注意事项来管理这种复杂性。这些规则的存在是为了使代码库易于管理，同时仍然允许工程师更有效地使用 Go 语言功能。
+本指南的目的是通過詳細描述在 Uber 撰寫 Go 程式碼的注意事項來管理這種複雜性。這些規則的存在是為了使函式庫易於管理，同時仍然允許工程師更有效地使用 Go 語言功能。
 
-该指南最初由 [Prashant Varanasi] 和 [Simon Newton] 编写，目的是使一些同事能快速使用 Go。多年来，该指南已根据其他人的反馈进行了修改。
+該指南最初由 [Prashant Varanasi] 和 [Simon Newton] 撰寫，目的是使一些同事能快速使用 Go。多年來，該指南已根據其他人的回饋進行了修改。
 
 [Prashant Varanasi]: https://github.com/prashantv
 [Simon Newton]: https://github.com/nomis52
 
-本文档记录了我们在 Uber 遵循的 Go 代码中的惯用约定。其中许多是 Go 的通用准则，而其他扩展准则依赖于下面外部的指南：
+本文件紀錄了我們在 Uber 遵循的 Go 程式碼中的慣用约定。其中許多是 Go 的通用準則，而其他擴展準則依赖於下面外部的指南：
 
 1. [Effective Go](https://golang.org/doc/effective_go.html)
 2. [Go Common Mistakes](https://github.com/golang/go/wiki/CommonMistakes)
 3. [Go Code Review Comments](https://github.com/golang/go/wiki/CodeReviewComments)
 
 
-所有代码都应该通过`golint`和`go vet`的检查并无错误。我们建议您将编辑器设置为：
+所有程式碼都應該通過`golint`和`go vet`的檢查並無錯誤。我們建議您將編輯器設置為：
 
-- 保存时运行 `goimports`
-- 运行 `golint` 和 `go vet` 检查错误
+- 保存時使用 `goimports`
+- 使用 `golint` 和 `go vet` 檢查錯誤
 
-您可以在以下 Go 编辑器工具支持页面中找到更为详细的信息：
+您可以在以下 Go 編輯器工具的相關頁面中找到更為詳細的訊息：
 <https://github.com/golang/go/wiki/IDEsAndTextEditorPlugins>
 
-## 指导原则
+## 指導準則
 
-### 指向 interface 的指针
+### 指向 interface 的指標
 
-您几乎不需要指向接口类型的指针。您应该将接口作为值进行传递，在这样的传递过程中，实质上传递的底层数据仍然可以是指针。
+您幾乎不需要指向介面類型的指標。您應該將介面作為值進行傳遞，在這樣的傳遞過程中，實質上傳遞的底層資料仍然可以是指標。
 
-接口实质上在底层用两个字段表示：
+介面實質上在底層用兩個段落表示：
 
-1. 一个指向某些特定类型信息的指针。您可以将其视为"type"。
-2. 数据指针。如果存储的数据是指针，则直接存储。如果存储的数据是一个值，则存储指向该值的指针。
+1. 一個指向某些特定類型訊息的指標。您可以將其视為"type"。
+2. 資料指標。如果儲存的資料是指標，則直接儲存。如果儲存的資料是一個值，則儲存指向該值的指標。
 
-如果希望接口方法修改基础数据，则必须使用指针传递 (将对象指针赋值给接口变量)。
+如果希望介面方法修改基礎資料，則必須使用指標傳遞 (將對象指標赋值给介面變數)。
 
 ```go
 type F interface {
@@ -195,23 +195,23 @@ type S2 struct{}
 
 func (s *S2) f() {}
 
-// f1.f() 无法修改底层数据
-// f2.f() 可以修改底层数据，给接口变量 f2 赋值时使用的是对象指针
+// f1.f() 無法修改底層資料
+// f2.f() 可以修改底層資料，给介面變數 f2 赋值時使用的是對象指標
 var f1 F = S1{}
 var f2 F = &S2{}
 ```
 
-### Interface 合理性验证
+### Interface 合理性驗證
 
-在编译时验证接口的符合性。这包括：
+在編譯時驗證介面的符合性。這包括：
 
-- 将实现特定接口的导出类型作为接口 API 的一部分进行检查
-- 实现同一接口的 (导出和非导出) 类型属于实现类型的集合
-- 任何违反接口合理性检查的场景，都会终止编译，并通知给用户
+- 將實作特定介面的導出類型作為介面 API 的一部分進行檢查
+- 實作同一介面的 (導出和非導出) 類型属於實作類型的集合
+- 任何違反介面合理性檢查的場景，都會终止編譯，並通知给使用者
 
-补充：上面 3 条是编译器对接口的检查机制，
-大体意思是错误使用接口会在编译期报错。
-所以可以利用这个机制让部分问题在编译期暴露。
+補充：上面 3 點是編譯器對介面的檢查機制，
+大體意思是錯誤使用介面會在編譯期報錯。
+所以可以利用這個機制讓部分問題在編譯期暴露。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -219,7 +219,7 @@ var f2 F = &S2{}
 <tr><td>
 
 ```go
-// 如果 Handler 没有实现 http.Handler，会在运行时报错
+// 如果 Handler 沒有實作 http.Handler，會在運作時報錯
 type Handler struct {
   // ...
 }
@@ -237,8 +237,8 @@ func (h *Handler) ServeHTTP(
 type Handler struct {
   // ...
 }
-// 用于触发编译期的接口的合理性检查机制
-// 如果 Handler 没有实现 http.Handler，会在编译期报错
+// 用於觸發編譯期的介面的合理性檢查機制
+// 如果 Handler 沒有實作 http.Handler，會在編譯期報錯
 var _ http.Handler = (*Handler)(nil)
 func (h *Handler) ServeHTTP(
   w http.ResponseWriter,
@@ -251,12 +251,12 @@ func (h *Handler) ServeHTTP(
 </td></tr>
 </tbody></table>
 
-如果 `*Handler` 与 `http.Handler` 的接口不匹配，
-那么语句 `var _ http.Handler = (*Handler)(nil)` 将无法编译通过。
+如果 `*Handler` 與 `http.Handler` 的介面不匹配，
+那麽語句 `var _ http.Handler = (*Handler)(nil)` 將無法編譯通過。
 
-赋值的右边应该是断言类型的零值。
-对于指针类型（如 `*Handler`）、切片和映射，这是 `nil`；
-对于结构类型，这是空结构。
+赋值的右邊應該是斷言類型的零值。
+對於指標類型（如 `*Handler`）、切片和映射，這是 `nil`；
+對於結構類型，這是空結構。
 
 ```go
 type LogHandler struct {
@@ -272,11 +272,11 @@ func (h LogHandler) ServeHTTP(
 }
 ```
 
-### 接收器 (receiver) 与接口
+### 接收器 (receiver) 與介面
 
-使用值接收器的方法既可以通过值调用，也可以通过指针调用。
+使用值接收器的方法既可以通過值調用，也可以通過指標調用。
 
-带指针接收器的方法只能通过指针或 [addressable values] 调用。
+帶指標接收器的方法只能通過指標或 [addressable values] 調用。
 
 [addressable values]: https://golang.org/ref/spec#Method_values
 
@@ -297,20 +297,20 @@ func (s *S) Write(str string) {
 
 sVals := map[int]S{1: {"A"}}
 
-// 你通过值只能调用 Read
+// 你通過值只能調用 Read
 sVals[1].Read()
 
-// 这不能编译通过：
+// 這不能編譯通過：
 //  sVals[1].Write("test")
 
 sPtrs := map[int]*S{1: {"A"}}
 
-// 通过指针既可以调用 Read，也可以调用 Write 方法
+// 通過指標既可以調用 Read，也可以調用 Write 方法
 sPtrs[1].Read()
 sPtrs[1].Write("test")
 ```
 
-类似的，即使方法有了值接收器，也同样可以用指针接收器来满足接口。
+類似的，即使方法有了值接收器，也同樣可以用指標接收器來滿足介面。
 
 ```go
 type F interface {
@@ -335,36 +335,36 @@ i = s1Val
 i = s1Ptr
 i = s2Ptr
 
-//  下面代码无法通过编译。因为 s2Val 是一个值，而 S2 的 f 方法中没有使用值接收器
+//  下面程式碼無法通過編譯。因為 s2Val 是一個值，而 S2 的 f 方法中沒有使用值接收器
 //   i = s2Val
 ```
 
-[Effective Go](https://golang.org/doc/effective_go.html) 中有一段关于 [pointers vs. values](https://golang.org/doc/effective_go.html#pointers_vs_values) 的精彩讲解。
+[Effective Go](https://golang.org/doc/effective_go.html) 中有一段關於 [pointers vs. values](https://golang.org/doc/effective_go.html#pointers_vs_values) 的精彩讲解。
 
-补充：
+補充：
 
-- 一个类型可以有值接收器方法集和指针接收器方法集
-  - 值接收器方法集是指针接收器方法集的子集，反之不是
-- 规则
-  - 值对象只可以使用值接收器方法集
-  - 指针对象可以使用 值接收器方法集 + 指针接收器方法集
-- 接口的匹配 (或者叫实现)
-  - 类型实现了接口的所有方法，叫匹配
-  - 具体的讲，要么是类型的值方法集匹配接口，要么是指针方法集匹配接口
+- 一個類型可以有值接收器方法集和指標接收器方法集
+  - 值接收器方法集是指標接收器方法集的子集，反之不是
+- 規則
+  - 值對象只可以使用值接收器方法集
+  - 指標對象可以使用 值接收器方法集 + 指標接收器方法集
+- 介面的匹配 (或者叫實作)
+  - 類型實作了介面的所有方法，叫匹配
+  - 具體的讲，要麽是類型的值方法集匹配介面，要麽是指標方法集匹配介面
 
-具体的匹配分两种：
+具體的匹配分兩種：
 
-- 值方法集和接口匹配
-  - 给接口变量赋值的不管是值还是指针对象，都 ok，因为都包含值方法集
-- 指针方法集和接口匹配
-  - 只能将指针对象赋值给接口变量，因为只有指针方法集和接口匹配
-  - 如果将值对象赋值给接口变量，会在编译期报错 (会触发接口合理性检查机制)
+- 值方法集和介面匹配
+  - 给介面變數赋值的不管是值還是指標對象，都 ok，因為都包含值方法集
+- 指標方法集和介面匹配
+  - 只能將指標對象赋值给介面變數，因為只有指標方法集和介面匹配
+  - 如果將值對象赋值给介面變數，會在編譯期報錯 (會觸發介面合理性檢查機制)
 
-为啥 i = s2Val 会报错，因为值方法集和接口不匹配。
+為何 i = s2Val 會報錯，因為值方法集和介面不匹配。
 
 ### 零值 Mutex 是有效的
 
-零值 `sync.Mutex` 和 `sync.RWMutex` 是有效的。所以指向 mutex 的指针基本是不必要的。
+零值 `sync.Mutex` 和 `sync.RWMutex` 是有效的。所以指向 mutex 的指標基本是不必要的。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -386,7 +386,7 @@ mu.Lock()
 </td></tr>
 </tbody></table>
 
-如果你使用结构体指针，mutex 应该作为结构体的非指针字段。即使该结构体不被导出，也不要直接把 mutex 嵌入到结构体中。
+如果你使用結構體指標，mutex 應該作為結構體的非指標段落。即使該結構體不被導出，也不要直接把 mutex 嵌入到結構體中。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -440,22 +440,22 @@ func (m *SMap) Get(k string) string {
 </td></tr>
 <tr><td>
 
-`Mutex` 字段， `Lock` 和 `Unlock` 方法是 `SMap` 导出的 API 中不刻意说明的一部分。
+`Mutex` 段落， `Lock` 和 `Unlock` 方法是 `SMap` 導出的 API 中不刻意說明的一部分。
 
  </td><td>
 
-mutex 及其方法是 `SMap` 的实现细节，对其调用者不可见。
+mutex 及其方法是 `SMap` 的實作，對其調用者不可見。
 
  </td></tr>
  </tbody></table>
 
-### 在边界处拷贝 Slices 和 Maps
+### 在邊界處複製 Slices 和 Maps
 
-slices 和 maps 包含了指向底层数据的指针，因此在需要复制它们时要特别注意。
+slices 和 maps 包含了指向底層資料的指標，因此在需要複製它們時要特別注意。
 
 #### 接收 Slices 和 Maps
 
-请记住，当 map 或 slice 作为函数参数传入时，如果您存储了对它们的引用，则用户可以对其进行修改。
+請記住，當 map 或 slice 作為函數参數傳入時，如果您儲存了對它們的引用，則使用者可以對其進行修改。
 
 <table>
 <thead><tr><th>Bad</th> <th>Good</th></tr></thead>
@@ -471,7 +471,7 @@ func (d *Driver) SetTrips(trips []Trip) {
 trips := ...
 d1.SetTrips(trips)
 
-// 你是要修改 d1.trips 吗？
+// 你是要修改 d1.trips 嗎？
 trips[0] = ...
 ```
 
@@ -487,7 +487,7 @@ func (d *Driver) SetTrips(trips []Trip) {
 trips := ...
 d1.SetTrips(trips)
 
-// 这里我们修改 trips[0]，但不会影响到 d1.trips
+// 這裡我們修改 trips[0]，但不會影響到 d1.trips
 trips[0] = ...
 ```
 
@@ -499,7 +499,7 @@ trips[0] = ...
 
 #### 返回 slices 或 maps
 
-同样，请注意用户对暴露内部状态的 map 或 slice 的修改。
+同樣，請注意使用者對暴露内部狀態的 map 或 slice 的修改。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -513,7 +513,7 @@ type Stats struct {
   counters map[string]int
 }
 
-// Snapshot 返回当前状态。
+// Snapshot 返回當前狀態。
 func (s *Stats) Snapshot() map[string]int {
   s.mu.Lock()
   defer s.mu.Unlock()
@@ -521,9 +521,9 @@ func (s *Stats) Snapshot() map[string]int {
   return s.counters
 }
 
-// snapshot 不再受互斥锁保护
-// 因此对 snapshot 的任何访问都将受到数据竞争的影响
-// 影响 stats.counters
+// snapshot 不再受互斥锁保護
+// 因此對 snapshot 的任何存取都將受到 race condition 影響
+// 影響 stats.counters
 snapshot := stats.Snapshot()
 ```
 
@@ -547,16 +547,16 @@ func (s *Stats) Snapshot() map[string]int {
   return result
 }
 
-// snapshot 现在是一个拷贝
+// snapshot 現在是一個拷贝
 snapshot := stats.Snapshot()
 ```
 
 </td></tr>
 </tbody></table>
 
-### 使用 defer 释放资源
+### 使用 defer 释放資源
 
-使用 defer 释放资源，诸如文件和锁。
+使用 defer 释放資源，諸如文件和锁。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -576,7 +576,7 @@ p.Unlock()
 
 return newCount
 
-// 当有多个 return 分支时，很容易遗忘 unlock
+// 當有多個 return 分支時，很容易遗忘 unlock
 ```
 
 </td><td>
@@ -592,17 +592,17 @@ if p.count < 10 {
 p.count++
 return p.count
 
-// 更可读
+// 更可讀
 ```
 
 </td></tr>
 </tbody></table>
 
-Defer 的开销非常小，只有在您可以证明函数执行时间处于纳秒级的程度时，才应避免这样做。使用 defer 提升可读性是值得的，因为使用它们的成本微不足道。尤其适用于那些不仅仅是简单内存访问的较大的方法，在这些方法中其他计算的资源消耗远超过 `defer`。
+Defer 的開銷非常小，只有在您可以證明函數納秒執行時間處於納秒级的程度時，才應避免這樣做。使用 defer 提升可讀性是值得的，因為使用它們的成本微不足道。尤其適用於那些不僅僅是簡單記憶體存取的較大的方法，在這些方法中其他計算的資源消耗遠超過 `defer`。
 
-### Channel 的 size 要么是 1，要么是无缓冲的
+### Channel 的 size 要麽是 1，不然就是無暫存的
 
-channel 通常 size 应为 1 或是无缓冲的。默认情况下，channel 是无缓冲的，其 size 为零。任何其他尺寸都必须经过严格的审查。我们需要考虑如何确定大小，考虑是什么阻止了 channel 在高负载下和阻塞写时的写入，以及当这种情况发生时系统逻辑有哪些变化。(翻译解释：按照原文意思是需要界定通道边界，竞态条件，以及逻辑上下文梳理)
+channel 通常 size 應為 1 或是無暫存的。預設情況下，channel 是無暫存的，其 size 為零。任何其他大小都必須經過嚴格的檢查。我們需要考慮如何確定大小，考慮是什麽阻止了 channel 在高負載下和阻塞寫時的寫入，以及當這種情況發生時系统邏輯有哪些變化。(翻譯解釋：按照原文意思是需要界定通道邊界、競爭條件，以及邏輯 context 梳理)
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -610,7 +610,7 @@ channel 通常 size 应为 1 或是无缓冲的。默认情况下，channel 是�
 <tr><td>
 
 ```go
-// 应该足以满足任何情况！
+// 應該足以滿足任何情況！
 c := make(chan int, 64)
 ```
 
@@ -619,16 +619,16 @@ c := make(chan int, 64)
 ```go
 // 大小：1
 c := make(chan int, 1) // 或者
-// 无缓冲 channel，大小为 0
+// 無暫存 channel，大小為 0
 c := make(chan int)
 ```
 
 </td></tr>
 </tbody></table>
 
-### 枚举从 1 开始
+### 枚舉從1 開始
 
-在 Go 中引入枚举的标准方法是声明一个自定义类型和一个使用了 iota 的 const 组。由于变量的默认值为 0，因此通常应以非零值开头枚举。
+在 Go 中引入枚舉的標準方法是宣告一個自定義類型和一個使用了 iota 的 const 组。由於變數的預設值為 0，因此通常應以非零值開頭枚舉。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -664,7 +664,7 @@ const (
 </td></tr>
 </tbody></table>
 
-在某些情况下，使用零值是有意义的（枚举从零开始），例如，当零值是理想的默认行为时。
+在某些情況下，使用零值是有意義的（枚舉從零開始），例如，當零值是理想的預設行為時。
 
 ```go
 type LogOutput int
@@ -678,25 +678,25 @@ const (
 // LogToStdout=0, LogToFile=1, LogToRemote=2
 ```
 
-### 使用 time 处理时间
+### 使用 time 處理時間
 
-时间处理很复杂。关于时间的错误假设通常包括以下几点。
+時間處理很複雜。關於時間的錯誤假設通常包括以下幾點。
 
-1. 一天有 24 小时
-2. 一小时有 60 分钟
+1. 一天有 24 小時
+2. 一小時有 60 分鐘
 3. 一周有七天
 4. 一年 365 天
-5. [还有更多](https://infiniteundo.com/post/25326999628/falsehoods-programmers-believe-about-time)
+5. [還有更多](https://infiniteundo.com/post/25326999628/falsehoods-programmers-believe-about-time)
 
-例如，*1* 表示在一个时间点上加上 24 小时并不总是产生一个新的日历日。
+例如，*1* 表示在一個時間點上加上 24 小時並不總是產生一個新的日曆日。
 
-因此，在处理时间时始终使用 [`"time"`] 包，因为它有助于以更安全、更准确的方式处理这些不正确的假设。
+因此，在處理時間時始终使用 [`"time"`] 包，因為它有助於以更安全、更準確的方式處理這些不正確的假設。
 
 [`"time"`]: https://golang.org/pkg/time/
 
-#### 使用 `time.Time` 表达瞬时时间
+#### 使用 `time.Time` 表達瞬時時間
 
-在处理时间的瞬间时使用 [`time.Time`]，在比较、添加或减去时间时使用 `time.Time` 中的方法。
+在處理時間的瞬間時使用 [`time.Time`]，在比較、加入或减去時間時使用 `time.Time` 中的方法。
 
 [`time.Time`]: https://golang.org/pkg/time/#Time
 
@@ -722,9 +722,9 @@ func isActive(now, start, stop time.Time) bool {
 </td></tr>
 </tbody></table>
 
-#### 使用 `time.Duration` 表达时间段
+#### 使用 `time.Duration` 表達時間區段
 
-在处理时间段时使用 [`time.Duration`] .
+在處理時間區段時使用 [`time.Duration`] .
 
 [`time.Duration`]: https://golang.org/pkg/time/#Duration
 
@@ -740,7 +740,7 @@ func poll(delay int) {
     time.Sleep(time.Duration(delay) * time.Millisecond)
   }
 }
-poll(10) // 是几秒钟还是几毫秒？
+poll(10) // 是幾秒鐘還是幾毫秒？
 ```
 
 </td><td>
@@ -758,7 +758,7 @@ poll(10*time.Second)
 </td></tr>
 </tbody></table>
 
-回到第一个例子，在一个时间瞬间加上 24 小时，我们用于添加时间的方法取决于意图。如果我们想要下一个日历日 (当前天的下一天) 的同一个时间点，我们应该使用 [`Time.AddDate`]。但是，如果我们想保证某一时刻比前一时刻晚 24 小时，我们应该使用 [`Time.Add`]。
+回到第一個例子，在一個時間瞬間加上 24 小時，我們用於加入時間的方法取決於意圖。如果我們想要下一個日曆日 (當前天的下一天) 的同一個時間點，我們應該使用 [`Time.AddDate`]。但是，如果我們想保證某一時刻比前一時刻晚 24 小時，我們應該使用 [`Time.Add`]。
 
 [`Time.AddDate`]: https://golang.org/pkg/time/#Time.AddDate
 [`Time.Add`]: https://golang.org/pkg/time/#Time.Add
@@ -768,14 +768,14 @@ newDay := t.AddDate(0 /* years */, 0 /* months */, 1 /* days */)
 maybeNewDay := t.Add(24 * time.Hour)
 ```
 
-#### 对外部系统使用 `time.Time` 和 `time.Duration`
+#### 對外部系統使用 `time.Time` 和 `time.Duration`
 
-尽可能在与外部系统的交互中使用 `time.Duration` 和 `time.Time` 例如 :
+盡可能在與外部系统的互動中使用 `time.Duration` 和 `time.Time` 例如 :
 
-- Command-line 标志: [`flag`] 通过 [`time.ParseDuration`] 支持 `time.Duration`
-- JSON: [`encoding/json`] 通过其 [`UnmarshalJSON` method] 方法支持将 `time.Time` 编码为 [RFC 3339] 字符串
-- SQL: [`database/sql`] 支持将 `DATETIME` 或 `TIMESTAMP` 列转换为 `time.Time`，如果底层驱动程序支持则返回
-- YAML: [`gopkg.in/yaml.v2`] 支持将 `time.Time` 作为 [RFC 3339] 字符串，并通过 [`time.ParseDuration`] 支持 `time.Duration`。
+- Command-line 標志: [`flag`] 通過 [`time.ParseDuration`] 支持 `time.Duration`
+- JSON: [`encoding/json`] 通過其 [`UnmarshalJSON` method] 方法支持將 `time.Time` 編碼為 [RFC 3339] 字串
+- SQL: [`database/sql`] 支持將 `DATETIME` 或 `TIMESTAMP` 列轉換為 `time.Time`，如果底層驅動程式支持則返回
+- YAML: [`gopkg.in/yaml.v2`] 支持將 `time.Time` 作為 [RFC 3339] 字串，並通過 [`time.ParseDuration`] 支持 `time.Duration`。
 
   [`flag`]: https://golang.org/pkg/flag/
   [`time.ParseDuration`]: https://golang.org/pkg/time/#ParseDuration
@@ -785,9 +785,9 @@ maybeNewDay := t.Add(24 * time.Hour)
   [`database/sql`]: https://golang.org/pkg/database/sql/
   [`gopkg.in/yaml.v2`]: https://godoc.org/gopkg.in/yaml.v2
 
-当不能在这些交互中使用 `time.Duration` 时，请使用 `int` 或 `float64`，并在字段名称中包含单位。
+當不能在這些互動中使用 `time.Duration` 時，請使用 `int` 或 `float64`，並在段落名稱中包含單位。
 
-例如，由于 `encoding/json` 不支持 `time.Duration`，因此该单位包含在字段的名称中。
+例如，由於 `encoding/json` 不支持 `time.Duration`，因此該單位包含在段落的名稱中。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -813,12 +813,12 @@ type Config struct {
 </td></tr>
 </tbody></table>
 
-当在这些交互中不能使用 `time.Time` 时，除非达成一致，否则使用 `string` 和 [RFC 3339] 中定义的格式时间戳。默认情况下，[`Time.UnmarshalText`] 使用此格式，并可通过 [`time.RFC3339`] 在 `Time.Format` 和 `time.Parse` 中使用。
+當在這些互動中不能使用 `time.Time` 時，除非達成一致，否則使用 `string` 和 [RFC 3339] 中定義的格式時間戳。預設情況下，[`Time.UnmarshalText`] 使用此格式，並可通過 [`time.RFC3339`] 在 `Time.Format` 和 `time.Parse` 中使用。
 
 [`Time.UnmarshalText`]: https://golang.org/pkg/time/#Time.UnmarshalText
 [`time.RFC3339`]: https://golang.org/pkg/time/#RFC3339
 
-尽管这在实践中并不成问题，但请记住，`"time"` 包不支持解析闰秒时间戳（[8728]），也不在计算中考虑闰秒（[15190]）。如果您比较两个时间瞬间，则差异将不包括这两个瞬间之间可能发生的闰秒。
+儘管這在實践中並不成問題，但請記住，`"time"` 套件不支持解析閏秒時間戳（[8728]），也不在計算中考慮閏秒（[15190]）。如果您比較兩個時間瞬間，則差异將不包括這兩個瞬間之間可能發生的閏秒。
 
 [8728]: https://github.com/golang/go/issues/8728
 [15190]: https://github.com/golang/go/issues/15190
@@ -828,22 +828,22 @@ type Config struct {
 
 ### Errors
 
-#### 错误类型
+#### 錯誤的類型
 
-声明错误的选项很少。
-在选择最适合您的用例的选项之前，请考虑以下事项。
+宣告錯誤的選項很少。
+在選擇最適合您的用例的選項之前，請考慮以下事項。
 
-- 调用者是否需要匹配错误以便他们可以处理它？
-  如果是，我们必须通过声明顶级错误变量或自定义类型来支持 [`errors.Is`] 或 [`errors.As`] 函数。
-- 错误消息是否为静态字符串，还是需要上下文信息的动态字符串？
-  如果是静态字符串，我们可以使用 [`errors.New`]，但对于后者，我们必须使用 [`fmt.Errorf`] 或自定义错误类型。
-- 我们是否正在传递由下游函数返回的新错误？
-   如果是这样，请参阅[错误包装部分](#错误包装)。
+- 調用者是否需要匹配錯誤以便他們可以處理它？
+  如果是，我們必須通過宣告頂層錯誤變數或自定義類型來支援 [`errors.Is`] 或 [`errors.As`] 函數。
+- 錯誤訊息是否為靜態字串，還是需要 context 訊息的動態字串？
+  如果是靜態字串，我們可以使用 [`errors.New`]，但對於後者，我們必須使用 [`fmt.Errorf`] 或自定義錯誤的類型。
+- 我們是否正在傳遞由下游函數返回的新錯誤？
+   如果是這樣，請參考[錯誤封裝部分](#錯誤封裝)。
 
 [`errors.Is`]: https://golang.org/pkg/errors/#Is
 [`errors.As`]: https://golang.org/pkg/errors/#As
 
-| 错误匹配？| 错误消息 | 指导                           |
+| 錯誤匹配？| 錯誤訊息 | 指導                           |
 |-----------------|---------------|-------------------------------------|
 | No              | static        | [`errors.New`]                      |
 | No              | dynamic       | [`fmt.Errorf`]                      |
@@ -854,11 +854,11 @@ type Config struct {
 [`fmt.Errorf`]: https://golang.org/pkg/fmt/#Errorf
 
 例如，
-使用 [`errors.New`] 表示带有静态字符串的错误。
-如果调用者需要匹配并处理此错误，则将此错误导出为变量以支持将其与 `errors.Is` 匹配。
+使用 [`errors.New`] 表示帶有靜態字串的錯誤。
+如果調用者需要匹配並處理此錯誤，則將此錯誤導出為變數以支持將其與 `errors.Is` 匹配。
 
 <table>
-<thead><tr><th>无错误匹配</th><th>错误匹配</th></tr></thead>
+<thead><tr><th>無錯誤匹配</th><th>錯誤匹配</th></tr></thead>
 <tbody>
 <tr><td>
 
@@ -902,12 +902,12 @@ if err := foo.Open(); err != nil {
 </td></tr>
 </tbody></table>
 
-对于动态字符串的错误，
-如果调用者不需要匹配它，则使用 [`fmt.Errorf`]，
-如果调用者确实需要匹配它，则自定义 `error`。
+對於動態字串的錯誤，
+如果調用者不需要匹配它，則使用 [`fmt.Errorf`]，
+如果調用者確實需要匹配它，則自定義 `error`。
 
 <table>
-<thead><tr><th>无错误匹配</th><th>错误匹配</th></tr></thead>
+<thead><tr><th>無錯誤匹配</th><th>錯誤匹配</th></tr></thead>
 <tbody>
 <tr><td>
 
@@ -959,35 +959,35 @@ if err := foo.Open("testfile.txt"); err != nil {
 </td></tr>
 </tbody></table>
 
-请注意，如果您从包中导出错误变量或类型，
-它们将成为包的公共 API 的一部分。
+請注意，如果您從包中導出錯誤變數或類型，
+它們將成為包的公共 API 的一部分。
 
-#### 错误包装
+#### 錯誤封裝
 
-如果调用其他方法时出现错误, 通常有三种处理方式可以选择：
+如果調用其他方法時出現錯誤, 通常有三種處理方式可以選擇：
 
-- 将原始错误原样返回
-- 使用 `fmt.Errorf` 搭配 `%w` 将错误添加进上下文后返回
-- 使用 `fmt.Errorf` 搭配 `%v` 将错误添加进上下文后返回
+- 將原始錯誤原樣返回
+- 使用 `fmt.Errorf` 搭配 `%w` 將錯誤加入進 context 後返回
+- 使用 `fmt.Errorf` 搭配 `%v` 將錯誤加入進 context 後返回
 
-如果没有要添加的其他上下文，则按原样返回原始错误。
-这将保留原始错误类型和消息。
-这非常适合底层错误消息有足够的信息来追踪它来自哪里的错误。
+如果沒有要加入其他 context，則按原樣返回原始錯誤。
+這將保留原始錯誤的類型和訊息。
+這非常適合底層錯誤訊息有足夠的訊息來追蹤它來自哪裡的錯誤。
 
-否则，尽可能在错误消息中添加上下文
-这样就不会出现诸如“连接被拒绝”之类的模糊错误，
-您会收到更多有用的错误，例如“调用服务 foo：连接被拒绝”。
+否則，盡可能在錯誤訊息中加入 context 
+這樣就不會出現諸如“連接被拒絕”之類的模糊錯誤，
+您會收到更多有用的錯誤，例如“調用服务 foo：連接被拒絕”。
 
-使用 `fmt.Errorf` 为你的错误添加上下文，
-根据调用者是否应该能够匹配和提取根本原因，在 `%w` 或 `%v` 动词之间进行选择。
+使用 `fmt.Errorf` 為你的錯誤加入 context ，
+根據調用者是否應該能夠匹配和提取根本原因，在 `%w` 或 `%v` 動詞之間進行選擇。
 
-- 如果调用者应该可以访问底层错误，请使用 `%w`。
-   对于大多数包装错误，这是一个很好的默认值，
-   但请注意，调用者可能会开始依赖此行为。因此，对于包装错误是已知`var`或类型的情况，请将其作为函数契约的一部分进行记录和测试。
-- 使用 `%v` 来混淆底层错误。
-  调用者将无法匹配它，但如果需要，您可以在将来切换到 `%w`。
+- 如果調用者應該可以存取底層錯誤，請使用 `%w`。
+   對於大多數包装錯誤，這是一個很好的預設值，
+   但請注意，調用者可能會開始依赖此行為。因此，對於包装錯誤是已知`var`或類型的情況，請將其作為函數契约的一部分進行紀錄和測試。
+- 使用 `%v` 來混淆底層錯誤。
+  調用者將無法匹配它，但如果需要，您可以在將來切换到 `%w`。
 
-在为返回的错误添加上下文时，通过避免使用"failed to"之类的短语来保持上下文简洁，当错误通过堆栈向上渗透时，它会一层一层被堆积起来：
+在為返回的錯誤加入 context 時，通過避免使用"failed to"之類的短語來保持 context 簡潔，當錯誤通過 stack 向上增加時，它會被一層一層的堆疊起來：
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -1027,37 +1027,37 @@ x: y: new store: the error
 </td></tr>
 </tbody></table>
 
-然而，一旦错误被发送到另一个系统，应该清楚消息是一个错误（例如`err` 标签或日志中的"Failed"前缀）。
+然而，一旦錯誤被發送到另一個系统，應該清楚訊息是一個錯誤（例如`err` 標籤或日誌中的"Failed"前缀）。
 
 
-另见 [不要只检查错误，优雅地处理它们]。
+另見 [不要只檢查錯誤，優雅地處理它們]。
 
   [`"pkg/errors".Cause`]: https://godoc.org/github.com/pkg/errors#Cause
-  [不要只检查错误，优雅地处理它们]: https://dave.cheney.net/2016/04/27/dont-just-check-errors-handle-them-gracefully
+  [不要只檢查錯誤，優雅地處理它們]: https://dave.cheney.net/2016/04/27/dont-just-check-errors-handle-them-gracefully
 
-#### 错误命名
+#### 錯誤命名
 
-对于存储为全局变量的错误值，
-根据是否导出，使用前缀 `Err` 或 `err`。
-请看指南 [对于未导出的顶层常量和变量，使用_作为前缀](#对于未导出的顶层常量和变量使用_作为前缀)。
+對於儲存為全域變數的錯誤值，
+根據是否導出，使用前缀 `Err` 或 `err`。
+請看指南 [對於未導出的上層常數和變數，使用_作為前缀](#對於未導出的上層常數和變數使用_作為前缀)。
 
 ```go
 var (
-  // 导出以下两个错误，以便此包的用户可以将它们与 errors.Is 进行匹配。
+  // 導出以下兩個錯誤，以便此包的使用者可以將它們與 errors.Is 進行匹配。
 
   ErrBrokenLink = errors.New("link is broken")
   ErrCouldNotOpen = errors.New("could not open")
 
-  // 这个错误没有被导出，因为我们不想让它成为我们公共 API 的一部分。 我们可能仍然在带有错误的包内使用它。
+  // 這個錯誤沒有被導出，因為我們不想讓它成為我們公共 API 的一部分。 我們可能仍然在帶有錯誤的套件中使用它。
 
   errNotFound = errors.New("not found")
 )
 ```
 
-对于自定义错误类型，请改用后缀 `Error`。
+對於自定義錯誤的類型，請改用後缀 `Error`。
 
 ```go
-// 同样，这个错误被导出，以便这个包的用户可以将它与 errors.As 匹配。
+// 同樣，這個錯誤被導出，以便這個包的使用者可以將它與 errors.As 匹配。
 
 type NotFoundError struct {
   File string
@@ -1067,7 +1067,7 @@ func (e *NotFoundError) Error() string {
   return fmt.Sprintf("file %q not found", e.File)
 }
 
-// 并且这个错误没有被导出，因为我们不想让它成为公共 API 的一部分。 我们仍然可以在带有 errors.As 的包中使用它。
+// 並且這個錯誤沒有被導出，因為我們不想讓它成為公共 API 的一部分。 我們仍然可以在帶有 errors.As 的包中使用它。
 type resolveError struct {
   Path string
 }
@@ -1077,11 +1077,11 @@ func (e *resolveError) Error() string {
 }
 ```
 
-### 处理断言失败
+### 處理斷言失敗
 
-[类型断言] 将会在检测到不正确的类型时，以单一返回值形式返回 panic。 因此，请始终使用“逗号 ok”习语。
+[類型斷言] 將會在检测到不正確的類型時，以單一返回值形式返回 panic。 因此，請始终使用“逗號 ok”习語。
 
-  [类型断言]: https://golang.org/ref/spec#Type_assertions
+  [類型斷言]: https://golang.org/ref/spec#Type_assertions
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -1097,7 +1097,7 @@ t := i.(string)
 ```go
 t, ok := i.(string)
 if !ok {
-  // 优雅地处理错误
+  // 優雅地處理錯誤
 }
 ```
 
@@ -1109,9 +1109,9 @@ fine. -->
 
 ### 不要使用 panic
 
-在生产环境中运行的代码必须避免出现 panic。panic 是 [级联失败] 的主要根源 。如果发生错误，该函数必须返回错误，并允许调用方决定如何处理它。
+在生產環境中運作的程式碼必須避免出現 panic。panic 是 [級聯失敗] 的主要原因 。如果發生錯誤，該函數必須返回錯誤，並允許調用方決定如何處理它。
 
-[级联失败]: https://en.wikipedia.org/wiki/Cascading_failure
+[級聯失敗]: https://en.wikipedia.org/wiki/Cascading_failure
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -1153,13 +1153,13 @@ func main() {
 </td></tr>
 </tbody></table>
 
-panic/recover 不是错误处理策略。仅当发生不可恢复的事情（例如：nil 引用）时，程序才必须 panic。程序初始化是一个例外：程序启动时应使程序中止的不良情况可能会引起 panic。
+panic/recover 不是錯誤處理策略。僅當發生不可恢復的事情（例如：nil 引用）時，程式才必須 panic。程式初始化是一個例外：程式啟動時應使程式中止的不良情況可能會引起 panic。
 
 ```go
 var _statusTemplate = template.Must(template.New("name").Parse("_statusHTML"))
 ```
 
-即使在测试代码中，也优先使用`t.Fatal`或者`t.FailNow`而不是 panic 来确保失败被标记。
+即使在測試程式碼中，也優先使用`t.Fatal`或者`t.FailNow`而不是 panic 來確保失敗被標記。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -1193,9 +1193,9 @@ if err != nil {
 
 ### 使用 go.uber.org/atomic
 
-使用 [sync/atomic] 包的原子操作对原始类型 (`int32`, `int64`等）进行操作，因为很容易忘记使用原子操作来读取或修改变量。
+使用 [sync/atomic] 包的原子操作對原始類型 (`int32`, `int64`等）進行操作，因為很容易忘記使用原子操作來讀取或修改變數。
 
-[go.uber.org/atomic] 通过隐藏基础类型为这些操作增加了类型安全性。此外，它包括一个方便的`atomic.Bool`类型。
+[go.uber.org/atomic] 通過隐藏基礎類型為這些操作增加了類型安全性。此外，它包括一個方便的`atomic.Bool`類型。
 
 [go.uber.org/atomic]: https://godoc.org/go.uber.org/atomic
 [sync/atomic]: https://golang.org/pkg/sync/atomic/
@@ -1246,10 +1246,10 @@ func (f *foo) isRunning() bool {
 </td></tr>
 </tbody></table>
 
-### 避免可变全局变量
+### 避免可變的全域變數
 
-使用选择依赖注入方式避免改变全局变量。
-既适用于函数指针又适用于其他值类型
+使用選擇依赖注入方式避免改變全域變數。
+既適用於函數指標又適用於其他值類型
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -1313,20 +1313,20 @@ func TestSigner(t *testing.T) {
 </td></tr>
 </tbody></table>
 
-### 避免在公共结构中嵌入类型
+### 避免在公共結構中嵌入類型
 
-这些嵌入的类型泄漏实现细节、禁止类型演化和模糊的文档。
+這些嵌入的類型泄漏實作、禁止類型演化和模糊的文件。
 
-假设您使用共享的 `AbstractList` 实现了多种列表类型，请避免在具体的列表实现中嵌入 `AbstractList`。
-相反，只需手动将方法写入具体的列表，该列表将委托给抽象列表。
+假設您使用共享的 `AbstractList` 實作了多種 list 類型，請避免在具體的 list 實作中嵌入 `AbstractList`。
+相反，只需手動將方法寫入具體的 list ，該 list 將委托给 abstract list 。
 
 ```go
 type AbstractList struct {}
-// 添加将实体添加到列表中。
+// 加入將實體加入到 list 中。
 func (l *AbstractList) Add(e Entity) {
   // ...
 }
-// 移除从列表中移除实体。
+// 移除從 list 中移除實體。
 func (l *AbstractList) Remove(e Entity) {
   // ...
 }
@@ -1338,7 +1338,7 @@ func (l *AbstractList) Remove(e Entity) {
 <tr><td>
 
 ```go
-// ConcreteList 是一个实体列表。
+// ConcreteList 是一個實體 list 。
 type ConcreteList struct {
   *AbstractList
 }
@@ -1347,15 +1347,15 @@ type ConcreteList struct {
 </td><td>
 
 ```go
-// ConcreteList 是一个实体列表。
+// ConcreteList 是一個實體 list 。
 type ConcreteList struct {
   list *AbstractList
 }
-// 添加将实体添加到列表中。
+// 加入將實體加入到 list 中。
 func (l *ConcreteList) Add(e Entity) {
   l.list.Add(e)
 }
-// 移除从列表中移除实体。
+// 移除從 list 中移除實體。
 func (l *ConcreteList) Remove(e Entity) {
   l.list.Remove(e)
 }
@@ -1364,15 +1364,15 @@ func (l *ConcreteList) Remove(e Entity) {
 </td></tr>
 </tbody></table>
 
-Go 允许 [类型嵌入](https://golang.org/doc/effective_go.html#embedding) 作为继承和组合之间的折衷。外部类型获取嵌入类型的方法的隐式副本。默认情况下，这些方法委托给嵌入实例的同一方法。
+Go 允許 [類型嵌入](https://golang.org/doc/effective_go.html#embedding) 作為继承和组合之間的折衷。外部類型获取嵌入類型的方法的隐式副本。預設情況下，這些方法委托给嵌入實例的同一方法。
 
-结构还获得与类型同名的字段。
-所以，如果嵌入的类型是 public，那么字段是 public。为了保持向后兼容性，外部类型的每个未来版本都必须保留嵌入类型。
+結構還获得與類型同名的段落。
+所以，如果嵌入的類型是 public，那麽段落是 public。為了保持向後兼容性，外部類型的每個未來版本都必須保留嵌入類型。
 
-很少需要嵌入类型。
-这是一种方便，可以帮助您避免编写冗长的委托方法。
+很少需要嵌入類型。
+這是一種方便，可以帮助您避免撰寫冗長的委托方法。
 
-即使嵌入兼容的抽象列表 *interface*，而不是结构体，这将为开发人员提供更大的灵活性来改变未来，但仍然泄露了具体列表使用抽象实现的细节。
+即使嵌入兼容的抽象 list  *interface*，而不是結構體，這將為開發人员提供更大的靈活性來改變未來，但仍然洩漏了具體 list 使用抽象實作的細節。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -1380,12 +1380,12 @@ Go 允许 [类型嵌入](https://golang.org/doc/effective_go.html#embedding) 作
 <tr><td>
 
 ```go
-// AbstractList 是各种实体列表的通用实现。
+// AbstractList 是各種實體 list 的通用實作。
 type AbstractList interface {
   Add(Entity)
   Remove(Entity)
 }
-// ConcreteList 是一个实体列表。
+// ConcreteList 是一個實體 list 。
 type ConcreteList struct {
   AbstractList
 }
@@ -1394,15 +1394,15 @@ type ConcreteList struct {
 </td><td>
 
 ```go
-// ConcreteList 是一个实体列表。
+// ConcreteList 是一個實體 list 。
 type ConcreteList struct {
   list AbstractList
 }
-// 添加将实体添加到列表中。
+// 將 Entity 加進 list。
 func (l *ConcreteList) Add(e Entity) {
   l.list.Add(e)
 }
-// 移除从列表中移除实体。
+// 移除從 list 中移除 Entity。
 func (l *ConcreteList) Remove(e Entity) {
   l.list.Remove(e)
 }
@@ -1411,26 +1411,26 @@ func (l *ConcreteList) Remove(e Entity) {
 </td></tr>
 </tbody></table>
 
-无论是使用嵌入结构还是嵌入接口，都会限制类型的演化。
+無論是使用嵌入結構還是嵌入介面，都會限制類型的演化。
 
-- 向嵌入接口添加方法是一个破坏性的改变。
-- 从嵌入结构体删除方法是一个破坏性改变。
-- 删除嵌入类型是一个破坏性的改变。
-- 即使使用满足相同接口的类型替换嵌入类型，也是一个破坏性的改变。
+- 向嵌入介面加入方法是一個破壞性的改變。
+- 從嵌入結構體删除方法是一個破壞性改變。
+- 删除嵌入類型是一個破壞性的改變。
+- 即使使用滿足相同介面的類型替换嵌入類型，也是一個破壞性的改變。
 
-尽管编写这些委托方法是乏味的，但是额外的工作隐藏了实现细节，留下了更多的更改机会，还消除了在文档中发现完整列表接口的间接性操作。
+儘管撰寫這些委托方法是乏味的，但是額外的工作隐藏了實作，留下了更多的更改機會，還消除了在文件中發現完整 list 介面的間接性操作。
 
-### 避免使用内置名称
+### 避免使用内置名稱
 
-Go [语言规范] 概述了几个内置的，
-不应在 Go 项目中使用的 [预先声明的标识符]。
+Go [語言規範] 概述了幾個内置的，
+不應在 Go 项目中使用的 [預先宣告的標識符]。
 
-根据上下文的不同，将这些标识符作为名称重复使用，
-将在当前作用域（或任何嵌套作用域）中隐藏原始标识符，或者混淆代码。
-在最好的情况下，编译器会报错；在最坏的情况下，这样的代码可能会引入潜在的、难以恢复的错误。
+根據 context 的不同，將這些標識符作為名稱重複使用，
+將在當前作用域（或任何嵌套作用域）中隐藏原始標識符，或者混淆程式碼。
+在最好的情況下，編譯器會報錯；在最壞的情況下，這樣的程式碼可能會引入潜在的、難以恢復的錯誤。
 
-[语言规范]: https://golang.org/ref/spec
-[预先声明的标识符]: https://golang.org/ref/spec#Predeclared_identifiers
+[語言規範]: https://golang.org/ref/spec
+[預先宣告的標識符]: https://golang.org/ref/spec#Predeclared_identifiers
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -1439,12 +1439,12 @@ Go [语言规范] 概述了几个内置的，
 
 ```go
 var error string
-// `error` 作用域隐式覆盖
+// `error` 作用域隐式覆蓋
 
 // or
 
 func handleErrorMessage(error string) {
-    // `error` 作用域隐式覆盖
+    // `error` 作用域隐式覆蓋
 }
 ```
 
@@ -1452,12 +1452,12 @@ func handleErrorMessage(error string) {
 
 ```go
 var errorMessage string
-// `error` 指向内置的非覆盖
+// `error` 指向内置的非覆蓋
 
 // or
 
 func handleErrorMessage(msg string) {
-    // `error` 指向内置的非覆盖
+    // `error` 指向内置的非覆蓋
 }
 ```
 
@@ -1466,18 +1466,18 @@ func handleErrorMessage(msg string) {
 
 ```go
 type Foo struct {
-    // 虽然这些字段在技术上不构成阴影，但`error`或`string`字符串的重映射现在是不明确的。
+    // 雖然這些段落在技術上不構成阴影，但`error`或`string`字串的重映射現在是不明確的。
     error  error
     string string
 }
 
 func (f Foo) Error() error {
-    // `error` 和 `f.error` 在视觉上是相似的
+    // `error` 和 `f.error` 在視覺上是相似的
     return f.error
 }
 
 func (f Foo) String() string {
-    // `string` and `f.string` 在视觉上是相似的
+    // `string` and `f.string` 在視覺上是相似的
     return f.string
 }
 ```
@@ -1486,7 +1486,7 @@ func (f Foo) String() string {
 
 ```go
 type Foo struct {
-    // `error` and `string` 现在是明确的。
+    // `error` and `string` 現在是明確的。
     err error
     str string
 }
@@ -1502,22 +1502,22 @@ func (f Foo) String() string {
 </td></tr>
 </tbody></table>
 
-注意，编译器在使用预先分隔的标识符时不会生成错误，
-但是诸如`go vet`之类的工具会正确地指出这些和其他情况下的隐式问题。
+注意，編譯器在使用預先分隔的標識符時不會生成錯誤，
+但是諸如`go vet`之類的工具會正確地指出這些和其他情況下的隐式問題。
 
 ### 避免使用 `init()`
 
-尽可能避免使用`init()`。当`init()`是不可避免或可取的，代码应先尝试：
+盡可能避免使用`init()`。當`init()`是不可避免或可取的，程式碼應先嘗試：
 
-1. 无论程序环境或调用如何，都要完全确定。
-2. 避免依赖于其他`init()`函数的顺序或副作用。虽然`init()`顺序是明确的，但代码可以更改，
-因此`init()`函数之间的关系可能会使代码变得脆弱和容易出错。
-3. 避免访问或操作全局或环境状态，如机器信息、环境变量、工作目录、程序参数/输入等。
-4. 避免`I/O`，包括文件系统、网络和系统调用。
+1. 無論程式環境或調用如何，都要完全確定。
+2. 避免依赖於其他`init()`函數的顺序或副作用。雖然`init()`顺序是明確的，但程式碼可以更改，
+因此`init()`函數之間的關系可能會使程式碼變得脆弱和容易出错。
+3. 避免存取或操作全域或環境狀態，如機器訊息、環境變數、工作目錄、程式参數/輸入等。
+4. 避免`I/O`，包括檔案系統、網路和系統呼叫。
 
-不能满足这些要求的代码可能属于要作为`main()`调用的一部分（或程序生命周期中的其他地方），
-或者作为`main()`本身的一部分写入。特别是，打算由其他程序使用的库应该特别注意完全确定性，
-而不是执行“init magic”
+不能滿足這些要求的程式碼可能属於要作為`main()`調用的一部分（或程式生命周期中的其他地方），
+或者作為`main()`本身的一部分寫入。特別是，打算由其他程式使用的函式庫應該特別注意完全確定性，
+而不是納秒執行“init magic”
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -1542,7 +1542,7 @@ func init() {
 var _defaultFoo = Foo{
     // ...
 }
-// or，为了更好的可测试性：
+// or，為了更好的可測試性：
 var _defaultFoo = defaultFoo()
 func defaultFoo() Foo {
     return Foo{
@@ -1560,7 +1560,7 @@ type Config struct {
 }
 var _config Config
 func init() {
-    // Bad: 基于当前目录
+    // Bad: 基於當前目錄
     cwd, _ := os.Getwd()
     // Bad: I/O
     raw, _ := ioutil.ReadFile(
@@ -1592,19 +1592,19 @@ func loadConfig() Config {
 </td></tr>
 </tbody></table>
 
-考虑到上述情况，在某些情况下，`init()`可能更可取或是必要的，可能包括：
+考慮到上述情況，在某些情況下，`init()`可能更可取或是必要的，可能包括：
 
-- 不能表示为单个赋值的复杂表达式。
-- 可插入的钩子，如`database/sql`、编码类型注册表等。
-- 对 [Google Cloud Functions] 和其他形式的确定性预计算的优化。
+- 不能表示為單個赋值的複雜表達式。
+- 可插入的鉤子，如`database/sql`、編碼類型註冊表等。
+- 對 [Google Cloud Functions] 和其他形式的確定性预計算的優化。
 
   [Google Cloud Functions]: https://cloud.google.com/functions/docs/bestpractices/tips#use_global_variables_to_reuse_objects_in_future_invocations
 
-### 追加时优先指定切片容量
+### 追加時優先指定切片容量
 
-追加时优先指定切片容量
+追加時優先指定切片容量
 
-在尽可能的情况下，在初始化要追加的切片时为`make()`提供一个容量值。
+在盡可能的情況下，在初始化要追加的切片時為`make()`提供一個容量值。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -1647,14 +1647,14 @@ BenchmarkGood-4   100000000    0.21s
 </td></tr>
 </tbody></table>
 
-### 主函数退出方式 (Exit)
+### 主函數退出方式 (Exit)
 
-Go 程序使用 [`os.Exit`] 或者 [`log.Fatal*`] 立即退出 (使用`panic`不是退出程序的好方法，请 [不要使用 panic](#不要使用-panic)。)
+Go 程式使用 [`os.Exit`] 或者 [`log.Fatal*`] 立即退出 (使用`panic`不是退出程式的好方法，請 [不要使用 panic](#不要使用-panic)。)
 
   [`os.Exit`]: https://golang.org/pkg/os/#Exit
   [`log.Fatal*`]: https://golang.org/pkg/log/#Fatal
 
-**仅在`main()`** 中调用其中一个 `os.Exit` 或者 `log.Fatal*`。所有其他函数应将错误返回到信号失败中。
+**僅在`main()`** 中調用其中一個 `os.Exit` 或者 `log.Fatal*`。所有其他函數應將錯誤返回到信號失敗中。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -1705,15 +1705,15 @@ func readFile(path string) (string, error) {
 </td></tr>
 </tbody></table>
 
-原则上：退出的具有多种功能的程序存在一些问题：
+原則上：退出的具有多種功能的程式存在一些問題：
 
-- 不明显的控制流：任何函数都可以退出程序，因此很难对控制流进行推理。
-- 难以测试：退出程序的函数也将退出调用它的测试。这使得函数很难测试，并引入了跳过 `go test` 尚未运行的其他测试的风险。
-- 跳过清理：当函数退出程序时，会跳过已经进入`defer`队列里的函数调用。这增加了跳过重要清理任务的风险。
+- 不明顯的控制流：任何函數都可以退出程式，因此很難對控制流進行推理。
+- 難以測試：退出程式的函數也將退出調用它的測試。這使得函數很難測試，並引入了跳過 `go test` 尚未運作的其他測試的風险。
+- 跳過清理：當函數退出程式時，會跳過已经進入`defer` queue 裡的函數調用。這增加了跳過重要清理任務的風险。
 #### 一次性退出
 
-如果可能的话，你的`main（）`函数中 **最多一次** 调用 `os.Exit`或者`log.Fatal`。如果有多个错误场景停止程序执行，请将该逻辑放在单独的函数下并从中返回错误。
-这会缩短 `main()` 函数，并将所有关键业务逻辑放入一个单独的、可测试的函数中。
+如果可能的话，你的`main（）`函數中 **最多一次** 調用 `os.Exit`或者`log.Fatal`。如果有多個錯誤場景停止程式納秒執行，請將該邏輯放在單獨的函數下並從中返回錯誤。
+這會缩短 `main()` 函數，並將所有關键業務邏輯放入一個單獨的、可測試的函數中。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -1733,8 +1733,8 @@ func main() {
     log.Fatal(err)
   }
   defer f.Close()
-  // 如果我们调用 log.Fatal 在这条线之后
-  // f.Close 将会被执行。
+  // 如果我們調用 log.Fatal 在這條線之後
+  // f.Close 將會被納秒執行。
   b, err := ioutil.ReadAll(f)
   if err != nil {
     log.Fatal(err)
@@ -1774,10 +1774,10 @@ func run() error {
 </td></tr>
 </tbody></table>
 
-### 在序列化结构中使用字段标记
+### 在序列化結構中使用段落標記
 
 任何序列化到JSON、YAML、，
-或其他支持基于标记的字段命名的格式应使用相关标记进行注释。
+或其他支持基於標記的段落命名的格式應使用相關標記進行註釋。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -1812,18 +1812,18 @@ bytes, err := json.Marshal(Stock{
 </td></tr>
 </tbody></table>
 
-理论上：
-结构的序列化形式是不同系统之间的契约。
-对序列化表单结构（包括字段名）的更改会破坏此约定。在标记中指定字段名使约定明确，
-它还可以通过重构或重命名字段来防止意外违反约定。
+理論上：
+結構的序列化形式是不同系统之間的契约。
+對序列化表單結構（包括段落名）的更改會破壞此约定。在標記中指定段落名使约定明確，
+它還可以通過重構或重命名段落來防止意外違反约定。
 
 ## 性能
 
-性能方面的特定准则只适用于高频场景。
+性能方面的特定準則只適用於高频場景。
 
-### 优先使用 strconv 而不是 fmt
+### 優先使用 strconv 而不是 fmt
 
-将原语转换为字符串或从字符串转换时，`strconv`速度比`fmt`快。
+將原語轉換為字串或從字串轉換時，`strconv`速度比`fmt`快。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -1862,9 +1862,9 @@ BenchmarkStrconv-4    64.2 ns/op    1 allocs/op
 
 
 
-### 避免字符串到字节的转换
+### 避免字串到字元的轉換
 
-不要反复从固定字符串创建字节 slice。相反，请执行一次转换并捕获结果。
+不要反覆從固定字串建立字元 slice。相反，請納秒執行一次轉換並捕獲结果。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -1904,21 +1904,21 @@ BenchmarkGood-4  500000000   3.25 ns/op
 
 ### 指定容器容量
 
-尽可能指定容器容量，以便为容器预先分配内存。这将在添加元素时最小化后续分配（通过复制和调整容器大小）。
+盡可能指定容器容量，以便為容器預先分配記憶體。這將在加入元素時最小化後續分配（通過複製和調整容器大小）。
 
 #### 指定 Map 容量提示
 
-在尽可能的情况下，在使用 `make()` 初始化的时候提供容量信息
+在盡可能的情況下，在使用 `make()` 初始化的時候提供容量訊息
 
 ```go
 make(map[T1]T2, hint)
 ```
 
-向`make()`提供容量提示会在初始化时尝试调整 map 的大小，这将减少在将元素添加到 map 时为 map 重新分配内存。
+向`make()`提供容量提示會在初始化時嘗試調整 map 的大小，這將減少在將元素加入到 map 時為 map 重新分配記憶體。
 
 
-注意，与 slices 不同。map capacity 提示并不保证完全的抢占式分配，而是用于估计所需的 hashmap bucket 的数量。
-因此，在将元素添加到 map 时，甚至在指定 map 容量时，仍可能发生分配。
+注意，與 slices 不同。map capacity 提示並不保證完全的搶斷式分配，而是用於估計所需的 hashmap bucket 的數量。
+因此，在將元素加入到 map 時，甚至在指定 map 容量時，仍可能發生分配。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -1949,25 +1949,25 @@ for _, f := range files {
 </td></tr>
 <tr><td>
 
-`m` 是在没有大小提示的情况下创建的； 在运行时可能会有更多分配。
+`m` 是在沒有大小提示的情況下建立的； 在運作時可能會有更多分配。
 
 </td><td>
 
-`m` 是有大小提示创建的；在运行时可能会有更少的分配。
+`m` 是有大小提示建立的；在運作時可能會有更少的分配。
 
 </td></tr>
 </tbody></table>
 
 #### 指定切片容量
 
-在尽可能的情况下，在使用`make()`初始化切片时提供容量信息，特别是在追加切片时。
+在盡可能的情況下，在使用`make()`初始化切片時提供容量訊息，特別是在追加切片時。
 
 ```go
 make([]T, length, capacity)
 ```
 
-与 maps 不同，slice capacity 不是一个提示：编译器将为提供给`make()`的 slice 的容量分配足够的内存，
-这意味着后续的 append()`操作将导致零分配（直到 slice 的长度与容量匹配，在此之后，任何 append 都可能调整大小以容纳其他元素）。
+與 maps 不同，slice capacity 不是一個提示：編譯器將為提供给`make()`的 slice 的容量分配足夠的記憶體，
+這意味著後續的 append()`操作將導致零分配（直到 slice 的長度與容量匹配，在此之後，任何 append 都可能調整大小以容纳其他元素）。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -2010,30 +2010,30 @@ BenchmarkGood-4   100000000    0.21s
 </td></tr>
 </tbody></table>
 
-## 规范
-### 避免过长的行
+## 規範
+### 避免過長的行
 
-避免使用需要读者水平滚动或过度转动头部的代码行。
+避免使用需要讀者水平滚動或過度轉動頭部的程式碼行。
 
-我们建议将行长度限制为 **99 characters** (99 个字符).
-作者应该在达到这个限制之前换行，
-但这不是硬性限制。
-允许代码超过此限制。
+我們建議將行長度限制為 **99 characters** (99 個字符).
+作者應該在達到這個限制之前换行，
+但這不是硬性限制。
+允許程式碼超過此限制。
 ### 一致性
 
-本文中概述的一些标准都是客观性的评估，是根据场景、上下文、或者主观性的判断；
+本文中概述的一些標準都是客觀性的评估，是根據場景、 context 、或者主觀性的判断；
 
 但是最重要的是，**保持一致**.
 
-一致性的代码更容易维护、是更合理的、需要更少的学习成本、并且随着新的约定出现或者出现错误后更容易迁移、更新、修复 bug
+一致性的程式碼更容易维護、是更合理的、需要更少的学习成本、並且随著新的约定出現或者出現錯誤後更容易移植、更新、修复 bug
 
-相反，在一个代码库中包含多个完全不同或冲突的代码风格会导致维护成本开销、不确定性和认知偏差。所有这些都会直接导致速度降低、代码审查痛苦、而且增加 bug 数量。
+相反，在一個函式庫中包含多個完全不同或衝突的程式碼風格會導致维護成本開銷、不確定性和認知偏差。所有這些都會直接導致速度降低、程式碼檢查痛苦、而且增加 bug 數量。
 
-将这些标准应用于代码库时，建议在 package（或更大）级别进行更改，子包级别的应用程序通过将多个样式引入到同一代码中，违反了上述关注点。
+將這些標準應用於函式庫時，建議在 package（或更大）等級進行更改，子套件等級的應用程式通過將多個樣式引入到同一程式碼中，違反了上述關注點。
 
-### 相似的声明放在一组
+### 相似的宣告放在一组
 
-Go 语言支持将相似的声明放在一个组内。
+Go 語言支持將相似的宣告放在一個组内。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -2057,7 +2057,7 @@ import (
 </td></tr>
 </tbody></table>
 
-这同样适用于常量、变量和类型声明：
+這同樣適用於常數、變數和類型宣告：
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -2098,7 +2098,7 @@ type (
 </td></tr>
 </tbody></table>
 
-仅将相关的声明放在一组。不要将不相关的声明放在一组。
+僅將相關的宣告放在一组。不要將不相關的宣告放在一组。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -2133,7 +2133,7 @@ const EnvVar = "MY_ENV"
 </td></tr>
 </tbody></table>
 
-分组使用的位置没有限制，例如：你可以在函数内部使用它们：
+分组使用的位置沒有限制，例如：你可以在函數内部使用它們：
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -2167,7 +2167,7 @@ func f() string {
 </td></tr>
 </tbody></table>
 
-例外：如果变量声明与其他变量相邻，则应将变量声明（尤其是函数内部的声明）分组在一起。对一起声明的变量执行此操作，即使它们不相关。
+例外：如果變數宣告與其他變數相鄰，則應將變數宣告（尤其是函數内部的宣告）分组在一起。對一起宣告的變數納秒執行此操作，即使它們不相關。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -2203,12 +2203,12 @@ func (c *client) request() {
 
 ### import 分组
 
-导入应该分为两组：
+導入應該分為兩组：
 
-- 标准库
-- 其他库
+- 標準函式庫
+- 其他函式庫
 
-默认情况下，这是 goimports 应用的分组。
+預設情況下，這是 goimports 應用的分组。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -2239,30 +2239,30 @@ import (
 </td></tr>
 </tbody></table>
 
-### 包名
+### 套件名稱
 
-当命名包时，请按下面规则选择一个名称：
+當命名包時，請按下面規則選擇一個名稱：
 
-- 全部小写。没有大写或下划线。
-- 大多数使用命名导入的情况下，不需要重命名。
-- 简短而简洁。请记住，在每个使用的地方都完整标识了该名称。
-- 不用复数。例如`net/url`，而不是`net/urls`。
-- 不要用“common”，“util”，“shared”或“lib”。这些是不好的，信息量不足的名称。
+- 全部小寫。沒有大寫或底線。
+- 大多數使用命名導入的情況下，不需要重命名。
+- 簡短而簡潔。請記住，在每個使用的地方都完整標記了該名稱。
+- 不用複數。例如`net/url`，而不是`net/urls`。
+- 不要用“common”，“util”，“shared”或“lib”。這些是不好的，訊息量不足的名稱。
 
-另请参阅 [Go 包命名规则] 和 [Go 包样式指南].
+另請參考 [Go 套件命名規則] 和 [Go 套件樣式指南].
 
-[Go 包命名规则]: https://blog.golang.org/package-names
-[Go 包样式指南]: https://rakyll.org/style-packages/
+[Go 套件命名規則]: https://blog.golang.org/package-names
+[Go 套件樣式指南]: https://rakyll.org/style-packages/
 
-### 函数名
+### 函數名
 
-我们遵循 Go 社区关于使用 [MixedCaps 作为函数名] 的约定。有一个例外，为了对相关的测试用例进行分组，函数名可能包含下划线，如：`TestMyFunction_WhatIsBeingTested`.
+我們遵循 Go 社群關於使用 [MixedCaps 作為函數名] 的约定。有一個例外，為了對相關的測試用例進行分组，函數名可能包含底線，如：`TestMyFunction_WhatIsBeingTested`.
 
-[MixedCaps 作为函数名]: https://golang.org/doc/effective_go.html#mixed-caps
+[MixedCaps 作為函數名]: https://golang.org/doc/effective_go.html#mixed-caps
 
-### 导入别名
+### 導入別名
 
-如果程序包名称与导入路径的最后一个元素不匹配，则必须使用导入别名。
+如果程式套件名稱稱與導入路径的最後一個元素不匹配，則必須使用導入別名。
 
 ```go
 import (
@@ -2273,7 +2273,7 @@ import (
 )
 ```
 
-在所有其他情况下，除非导入之间有直接冲突，否则应避免导入别名。
+在所有其他情況下，除非導入之間有直接衝突，否則應避免導入別名。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -2304,16 +2304,16 @@ import (
 </td></tr>
 </tbody></table>
 
-### 函数分组与顺序
+### 函數分组與顺序
 
-- 函数应按粗略的调用顺序排序。
-- 同一文件中的函数应按接收者分组。
+- 函數應按粗略的調用顺序排序。
+- 同一文件中的函數應按接收者分组。
 
-因此，导出的函数应先出现在文件中，放在`struct`, `const`, `var`定义的后面。
+因此，導出的函數應先出現在文件中，放在`struct`, `const`, `var`定義的後面。
 
-在定义类型之后，但在接收者的其余方法之前，可能会出现一个 `newXYZ()`/`NewXYZ()`
+在定義類型之後，但在接收者的其餘方法之前，可能會出現一個 `newXYZ()`/`NewXYZ()`
 
-由于函数是按接收者分组的，因此普通工具函数应在文件末尾出现。
+由於函數是按接收者分组的，因此普通工具函數應在文件末尾出現。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -2357,9 +2357,9 @@ func calcCost(n []int) int {...}
 </td></tr>
 </tbody></table>
 
-### 减少嵌套
+### 減少嵌套
 
-代码应通过尽可能先处理错误情况/特殊情况并尽早返回或继续循环来减少嵌套。减少嵌套多个级别的代码的代码量。
+程式碼應通過盡可能先處理錯誤情況/特殊情況並盡早返回或繼續循環來減少嵌套。減少嵌套多個等級的程式碼的程式碼量。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -2403,7 +2403,7 @@ for _, v := range data {
 
 ### 不必要的 else
 
-如果在 if 的两个分支中都设置了变量，则可以将其替换为单个 if。
+如果在 if 的兩個分支中都設置了變數，則可以將其替换為單個 if。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -2431,9 +2431,9 @@ if b {
 </td></tr>
 </tbody></table>
 
-### 顶层变量声明
+### 上層變數宣告
 
-在顶层，使用标准`var`关键字。请勿指定类型，除非它与表达式的类型不同。
+在上層，使用標準`var`關键字。請勿指定類型，除非它與表達式的類型不同。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -2450,8 +2450,8 @@ func F() string { return "A" }
 
 ```go
 var _s = F()
-// 由于 F 已经明确了返回一个字符串类型，因此我们没有必要显式指定_s 的类型
-// 还是那种类型
+// 由於 F 已经明確了返回一個字串類型，因此我們沒有必要顯式指定_s 的類型
+// 還是那種類型
 
 func F() string { return "A" }
 ```
@@ -2459,7 +2459,7 @@ func F() string { return "A" }
 </td></tr>
 </tbody></table>
 
-如果表达式的类型与所需的类型不完全匹配，请指定类型。
+如果表達式的類型與所需的類型不完全匹配，請指定類型。
 
 ```go
 type myError struct{}
@@ -2469,14 +2469,14 @@ func (myError) Error() string { return "error" }
 func F() myError { return myError{} }
 
 var _e error = F()
-// F 返回一个 myError 类型的实例，但是我们要 error 类型
+// F 返回一個 myError 類型的實例，但是我們要 error 類型
 ```
 
-### 对于未导出的顶层常量和变量，使用_作为前缀
+### 對於未導出的上層常數和變數，使用_作為前缀
 
-在未导出的顶级`vars`和`consts`， 前面加上前缀_，以使它们在使用时明确表示它们是全局符号。
+在未導出的頂層 `vars` 和 `consts`， 前面加上前缀 `_`，以使它們在使用時明確表示它們是全域符號。
 
-基本依据：顶级变量和常量具有包范围作用域。使用通用名称可能很容易在其他文件中意外使用错误的值。
+基本依據：頂層變數和常數具有套件範圍作用域。使用通用名稱可能很容易在其他文件中意外使用錯誤的值。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -2517,11 +2517,11 @@ const (
 </td></tr>
 </tbody></table>
 
-**例外**：未导出的错误值可以使用不带下划线的前缀 `err`。 参见[错误命名](#错误命名)。
+**例外**：未導出的錯誤值可以使用不帶底線的前缀 `err`。 参見[錯誤命名](#錯誤命名)。
 
-### 结构体中的嵌入
+### 結構體中的嵌入
 
-嵌入式类型（例如 mutex）应位于结构体内的字段列表的顶部，并且必须有一个空行将嵌入式字段与常规字段分隔开。
+嵌入式類型（例如 mutex）應位於結構體内的段落 list 的顶部，並且必須有一個空行將嵌入式段落與常规段落分隔開。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -2548,31 +2548,31 @@ type Client struct {
 </td></tr>
 </tbody></table>
 
-内嵌应该提供切实的好处，比如以语义上合适的方式添加或增强功能。
-它应该在对用户没有任何不利影响的情况下使用。（另请参见：[避免在公共结构中嵌入类型]）。
+内嵌應該提供切實的好處，比如以語義上合適的方式加入或增强功能。
+它應該在對使用者沒有任何不利影響的情況下使用。（另請参見：[避免在公共結構中嵌入類型]）。
 
-例外：即使在未导出类型中，Mutex 也不应该作为内嵌字段。另请参见：[零值 Mutex 是有效的]。
+例外：即使在未導出類型中，Mutex 也不應該作為内嵌段落。另請参見：[零值 Mutex 是有效的]。
 
-[避免在公共结构中嵌入类型]: #避免在公共结构中嵌入类型
+[避免在公共結構中嵌入類型]: #避免在公共結構中嵌入類型
 [零值 Mutex 是有效的]: #零值-mutex-是有效的
 
-嵌入 **不应该**:
+嵌入 **不應該**:
 
-- 纯粹是为了美观或方便。
-- 使外部类型更难构造或使用。
-- 影响外部类型的零值。如果外部类型有一个有用的零值，则在嵌入内部类型之后应该仍然有一个有用的零值。
-- 作为嵌入内部类型的副作用，从外部类型公开不相关的函数或字段。
-- 公开未导出的类型。
-- 影响外部类型的复制形式。
-- 更改外部类型的 API 或类型语义。
-- 嵌入内部类型的非规范形式。
-- 公开外部类型的实现详细信息。
-- 允许用户观察或控制类型内部。
-- 通过包装的方式改变内部函数的一般行为，这种包装方式会给用户带来一些意料之外情况。
+- 纯粹是為了美觀或方便。
+- 使外部類型更難構造或使用。
+- 影響外部類型的零值。如果外部類型有一個有用的零值，則在嵌入内部類型之後應該仍然有一個有用的零值。
+- 作為嵌入内部類型的副作用，從外部類型公開不相關的函數或段落。
+- 公開未導出的類型。
+- 影響外部類型的複製形式。
+- 更改外部類型的 API 或類型語義。
+- 嵌入内部類型的非規範形式。
+- 公開外部類型的實作詳細訊息。
+- 允許使用者觀察或控制類型内部。
+- 通過包装的方式改變内部函數的一般行為，這種包装方式會给使用者帶來一些意料之外情況。
 
-简单地说，有意识地和有目的地嵌入。一种很好的测试体验是，
-"是否所有这些导出的内部方法/字段都将直接添加到外部类型"
-如果答案是`some`或`no`，不要嵌入内部类型 - 而是使用字段。
+簡單地說，有意识地和有目的地嵌入。一種很好的測試體验是，
+"是否所有這些導出的内部方法/段落都將直接加入到外部類型"
+如果答案是`some`或`no`，不要嵌入内部類型 - 而是使用段落。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -2581,8 +2581,8 @@ type Client struct {
 
 ```go
 type A struct {
-    // Bad: A.Lock() and A.Unlock() 现在可用
-    // 不提供任何功能性好处，并允许用户控制有关 A 的内部细节。
+    // Bad: A.Lock() and A.Unlock() 現在可用
+    // 不提供任何功能性好處，並允許使用者控制有關 A 的内部細節。
     sync.Mutex
 }
 ```
@@ -2591,8 +2591,8 @@ type A struct {
 
 ```go
 type countingWriteCloser struct {
-    // Good: Write() 在外层提供用于特定目的，
-    // 并且委托工作到内部类型的 Write() 中。
+    // Good: Write() 在外層提供用於特定目的，
+    // 並且委托工作到内部類型的 Write() 中。
     io.WriteCloser
     count int
 }
@@ -2607,7 +2607,7 @@ func (w *countingWriteCloser) Write(bs []byte) (int, error) {
 
 ```go
 type Book struct {
-    // Bad: 指针更改零值的有用性
+    // Bad: 指標更改零值的有用性
     io.ReadWriter
     // other fields
 }
@@ -2659,9 +2659,9 @@ type Client struct {
 </td></tr>
 </tbody></table>
 
-### 本地变量声明
+### 本地變數宣告
 
-如果将变量明确设置为某个值，则应使用短变量声明形式 (`:=`)。
+如果將變數明確設置為某個值，則應使用短變數宣告形式 (`:=`)。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -2681,9 +2681,9 @@ s := "foo"
 </td></tr>
 </tbody></table>
 
-但是，在某些情况下，`var` 使用关键字时默认值会更清晰。例如，[声明空切片]。
+但是，在某些情況下，`var` 使用關键字時預設值會更清晰。例如，[宣告空切片]。
 
-[声明空切片]: https://github.com/golang/go/wiki/CodeReviewComments#declaring-empty-slices
+[宣告空切片]: https://github.com/golang/go/wiki/CodeReviewComments#declaring-empty-slices
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -2717,11 +2717,11 @@ func f(list []int) {
 </td></tr>
 </tbody></table>
 
-### nil 是一个有效的 slice
+### nil 是一個有效的 slice
 
-`nil` 是一个有效的长度为 0 的 slice，这意味着，
+`nil` 是一個有效的長度為 0 的 slice，這意味著，
 
-- 您不应明确返回长度为零的切片。应该返回`nil` 来代替。
+- 您不應明確返回長度為零的切片。應該返回`nil` 來代替。
 
   <table>
   <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -2745,7 +2745,7 @@ func f(list []int) {
   </td></tr>
   </tbody></table>
 
-- 要检查切片是否为空，请始终使用`len(s) == 0`。而非 `nil`。
+- 要檢查切片是否為空，請始终使用 `len(s) == 0`。而非 `nil`。
 
   <table>
   <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -2769,7 +2769,7 @@ func f(list []int) {
   </td></tr>
   </tbody></table>
 
-- 零值切片（用`var`声明的切片）可立即使用，无需调用`make()`创建。
+- 零值切片（用 `var` 宣告的切片）可立即使用，無需調用 `make()` 建立。
 
   <table>
   <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -2806,11 +2806,11 @@ func f(list []int) {
   </td></tr>
   </tbody></table>
 
-记住，虽然 nil 切片是有效的切片，但它不等于长度为 0 的切片（一个为 nil，另一个不是），并且在不同的情况下（例如序列化），这两个切片的处理方式可能不同。
+記住，雖然 nil 切片是有效的切片，但它不等於長度為 0 的切片（一個為 nil，另一個不是），並且在不同的情況下（例如序列化），這兩個切片的處理方式可能不同。
 
-### 缩小变量作用域
+### 缩小變數作用域
 
-如果有可能，尽量缩小变量作用范围。除非它与 [减少嵌套](#减少嵌套)的规则冲突。
+如果有可能，盡量缩小變數作用範圍。除非它與 [減少嵌套](#減少嵌套)的規則衝突。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -2835,7 +2835,7 @@ if err := ioutil.WriteFile(name, data, 0644); err != nil {
 </td></tr>
 </tbody></table>
 
-如果需要在 if 之外使用函数调用的结果，则不应尝试缩小范围。
+如果需要在 if 之外使用函數調用的结果，則不應嘗試缩小範圍。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -2875,9 +2875,9 @@ return nil
 </td></tr>
 </tbody></table>
 
-### 避免参数语义不明确 (Avoid Naked Parameters)
+### 避免参數語義不明確 (Avoid Naked Parameters)
 
-函数调用中的`意义不明确的参数`可能会损害可读性。当参数名称的含义不明显时，请为参数添加 C 样式注释 (`/* ... */`)
+函數調用中的`意義不明確的参數`可能會损害可讀性。當参數名稱的含義不明顯時，請為参數加入 C 樣式註釋 (`/* ... */`)
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -2901,7 +2901,7 @@ printInfo("foo", true /* isLocal */, true /* done */)
 </td></tr>
 </tbody></table>
 
-对于上面的示例代码，还有一种更好的处理方式是将上面的 `bool` 类型换成自定义类型。将来，该参数可以支持不仅仅局限于两个状态（true/false）。
+對於上面的示例程式碼，還有一種更好的處理方式是將上面的 `bool` 類型换成自定義類型。將來，該参數可以支持不僅僅局限於兩個狀態（true/false）。
 
 ```go
 type Region int
@@ -2922,11 +2922,11 @@ const (
 func printInfo(name string, region Region, status Status)
 ```
 
-### 使用原始字符串字面值，避免转义
+### 使用原始字串字面值，避免轉義
 
-Go 支持使用 [原始字符串字面值](https://golang.org/ref/spec#raw_string_lit)，也就是 " ` " 来表示原生字符串，在需要转义的场景下，我们应该尽量使用这种方案来替换。
+Go 支持使用 [原始字串字面值](https://golang.org/ref/spec#raw_string_lit)，也就是 " ` " 來表示原生字串，在需要轉義的場景下，我們應該盡量使用這種方案來替换。
 
-可以跨越多行并包含引号。使用这些字符串可以避免更难阅读的手工转义的字符串。
+可以跨越多行並包含引號。使用這些字串可以避免更難阅讀的手工轉義的字串。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -2946,11 +2946,11 @@ wantError := `unknown error:"test"`
 </td></tr>
 </tbody></table>
 
-### 初始化结构体
+### 初始化結構體
 
-#### 使用字段名初始化结构
+#### 使用段落名初始化結構
 
-初始化结构时，几乎应该始终指定字段名。目前由 [`go vet`] 强制执行。
+初始化結構時，幾乎應該始终指定段落名。目前由 [`go vet`] 强制納秒執行。
 
 [`go vet`]: https://golang.org/cmd/vet/
 
@@ -2976,7 +2976,7 @@ k := User{
 </td></tr>
 </tbody></table>
 
-例外：当有 3 个或更少的字段时，测试表中的字段名*may*可以省略。
+例外：當有 3 個或更少的段落時，測試表中的段落名*may*可以省略。
 
 ```go
 tests := []struct{
@@ -2987,10 +2987,10 @@ tests := []struct{
   {Subtract, "subtract"},
 }
 ```
-#### 省略结构中的零值字段
+#### 省略結構中的零值段落
 
-初始化具有字段名的结构时，除非提供有意义的上下文，否则忽略值为零的字段。
-也就是，让我们自动将这些设置为零值
+初始化具有段落名的結構時，除非提供有意義的 context ，否則忽略值為零的段落。
+也就是，讓我們自動將這些設置為零值
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -3018,9 +3018,9 @@ user := User{
 </td></tr>
 </tbody></table>
 
-这有助于通过省略该上下文中的默认值来减少阅读的障碍。只指定有意义的值。
+這有助於通過省略該 context 中的預設值來減少阅讀的障碍。只指定有意義的值。
 
-在字段名提供有意义上下文的地方包含零值。例如，[表驱动测试](#表驱动测试) 中的测试用例可以受益于字段的名称，即使它们是零值的。
+在段落名提供有意義 context 的地方包含零值。例如，[表驅動測試](#表驅動測試) 中的測試用例可以受益於段落的名稱，即使它們是零值的。
 
 ```go
 tests := []struct{
@@ -3031,9 +3031,9 @@ tests := []struct{
   // ...
 }
 ```
-#### 对零值结构使用 `var`
+#### 對零值結構使用 `var`
 
-如果在声明中省略了结构的所有字段，请使用 `var` 声明结构。
+如果在宣告中省略了結構的所有段落，請使用 `var` 宣告結構。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -3053,12 +3053,12 @@ var user User
 </td></tr>
 </tbody></table>
 
-这将零值结构与那些具有类似于为 [初始化 Maps](#初始化-maps) 创建的，区别于非零值字段的结构区分开来，
-并与我们更喜欢的 [声明空切片] 方式相匹配。
+這將零值結構與那些具有類似於為 [初始化 Maps](#初始化-maps) 建立的，区別於非零值段落的結構区分開來，
+並與我們更喜欢的 [宣告空切片] 方式相匹配。
 
 #### 初始化 Struct 引用
 
-在初始化结构引用时，请使用`&T{}`代替`new(T)`，以使其与结构体初始化一致。
+在初始化結構引用時，請使用`&T{}`代替`new(T)`，以使其與結構體初始化一致。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -3086,8 +3086,8 @@ sptr := &T{Name: "bar"}
 
 ### 初始化 Maps
 
-对于空 map 请使用 `make(..)` 初始化， 并且 map 是通过编程方式填充的。
-这使得 map 初始化在表现上不同于声明，并且它还可以方便地在 make 后添加大小提示。
+對於空 map 請使用 `make(..)` 初始化， 並且 map 是通過编程方式填充的。
+這使得 map 初始化在表現上不同於宣告，並且它還可以方便地在 make 後加入大小提示。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -3096,8 +3096,8 @@ sptr := &T{Name: "bar"}
 
 ```go
 var (
-  // m1 读写安全;
-  // m2 在写入时会 panic
+  // m1 讀寫安全;
+  // m2 在寫入時會 panic
   m1 = map[T1]T2{}
   m2 map[T1]T2
 )
@@ -3107,8 +3107,8 @@ var (
 
 ```go
 var (
-  // m1 读写安全;
-  // m2 在写入时会 panic
+  // m1 讀寫安全;
+  // m2 在寫入時會 panic
   m1 = make(map[T1]T2)
   m2 map[T1]T2
 )
@@ -3117,19 +3117,19 @@ var (
 </td></tr>
 <tr><td>
 
-声明和初始化看起来非常相似的。
+宣告和初始化看起來非常相似的。
 
 </td><td>
 
-声明和初始化看起来差别非常大。
+宣告和初始化看起來差別非常大。
 
 </td></tr>
 </tbody></table>
 
-在尽可能的情况下，请在初始化时提供 map 容量大小，详细请看 [指定 Map 容量提示](#指定Map容量提示)。
+在盡可能的情況下，請在初始化時提供 map 容量大小，詳細請看 [指定 Map 容量提示](#指定Map容量提示)。
 
 
-另外，如果 map 包含固定的元素列表，则使用 map literals(map 初始化列表) 初始化映射。
+另外，如果 map 包含固定的元素 list ，則使用 map literals(map 初始化 list ) 初始化映射。
 
 
 <table>
@@ -3157,13 +3157,13 @@ m := map[T1]T2{
 </td></tr>
 </tbody></table>
 
-基本准则是：在初始化时使用 map 初始化列表 来添加一组固定的元素。否则使用 `make` (如果可以，请尽量指定 map 容量)。
+基本準則是：在初始化時使用 map 初始化 list  來加入一组固定的元素。否則使用 `make` (如果可以，請盡量指定 map 容量)。
 
-### 字符串 string format
+### 字串 string format
 
-如果你在函数外声明`Printf`-style 函数的格式字符串，请将其设置为`const`常量。
+如果你在函數外宣告 `Printf`-style 函數的格式字串，請將其設置為 `const` 常數。
 
-这有助于`go vet`对格式字符串执行静态分析。
+這有助於 `go vet` 對格式字串納秒執行靜態分析。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -3185,29 +3185,29 @@ fmt.Printf(msg, 1, 2)
 </td></tr>
 </tbody></table>
 
-### 命名 Printf 样式的函数
+### 命名 Printf 樣式的函數
 
-声明`Printf`-style 函数时，请确保`go vet`可以检测到它并检查格式字符串。
+宣告 `Printf`-style 函數時，請確保 `go vet` 可以检测到它並檢查格式字串。
 
-这意味着您应尽可能使用预定义的`Printf`-style 函数名称。`go vet`将默认检查这些。有关更多信息，请参见 [Printf 系列]。
+這意味著您應盡可能使用预定義的 `Printf`-style 函數名稱。`go vet` 將預設檢查這些。有關更多訊息，請参見 [Printf 系列]。
 
 [Printf 系列]: https://golang.org/cmd/vet/#hdr-Printf_family
 
-如果不能使用预定义的名称，请以 f 结束选择的名称：`Wrapf`，而不是`Wrap`。`go vet`可以要求检查特定的 Printf 样式名称，但名称必须以`f`结尾。
+如果不能使用预定義的名稱，請以 f 结束選擇的名稱：`Wrapf`，而不是 `Wrap`。`go vet` 可以要求檢查特定的 Printf 樣式名稱，但名稱必須以 `f` 结尾。
 
 ```shell
 $ go vet -printfuncs=wrapf,statusf
 ```
 
-另请参阅 [go vet: Printf family check].
+另請參考 [go vet: Printf family check].
 
 [go vet: Printf family check]: https://kuzminva.wordpress.com/2017/11/07/go-vet-printf-family-check/
 
 ## 编程模式
 
-### 表驱动测试
+### 表驅動測試
 
-当测试逻辑是重复的时候，通过  [subtests] 使用 table 驱动的方式编写 case 代码看上去会更简洁。
+當測試邏輯是重複的時候，通過  [subtests] 使用 table 驅動的方式撰寫 case 程式碼看上去會更簡潔。
 
 [subtests]: https://blog.golang.org/subtests
 
@@ -3285,9 +3285,9 @@ for _, tt := range tests {
 </td></tr>
 </tbody></table>
 
-很明显，使用 test table 的方式在代码逻辑扩展的时候，比如新增 test case，都会显得更加的清晰。
+很明顯，使用 test table 的方式在程式碼邏輯擴展的時候，比如新增 test case，都會顯得更加的清晰。
 
-我们遵循这样的约定：将结构体切片称为`tests`。 每个测试用例称为`tt`。此外，我们鼓励使用`give`和`want`前缀说明每个测试用例的输入和输出值。
+我們遵循這樣的约定：將結構體切片稱為`tests`。 每個測試用例稱為`tt`。此外，我們鼓励使用`give`和`want`前缀說明每個測試用例的輸入和輸出值。
 
 ```go
 tests := []struct{
@@ -3303,8 +3303,8 @@ for _, tt := range tests {
 }
 ```
 
-并行测试，比如一些专门的循环（例如，生成goroutine或捕获引用作为循环体的一部分的那些循环）
-必须注意在循环的范围内显式地分配循环变量，以确保它们保持预期的值。
+並行測試，比如一些专门的循環（例如，生成goroutine或捕獲引用作為循環體的一部分的那些循環）
+必須注意在循環的範圍内顯式地分配循環變數，以確保它們保持预期的值。
 
 ```go
 tests := []struct{
@@ -3322,14 +3322,14 @@ for _, tt := range tests {
 }
 ```
 
-在上面的例子中，由于下面使用了`t.Parallel()`，我们必须声明一个作用域为循环迭代的`tt`变量。
-如果我们不这样做，大多数或所有测试都会收到一个意外的`tt`值，或者一个在运行时发生变化的值。
+在上面的例子中，由於下面使用了`t.Parallel()`，我們必須宣告一個作用域為循環迭代的`tt`變數。
+如果我們不這樣做，大多數或所有測試都會收到一個意外的`tt`值，或者一個在運作時發生變化的值。
 
-### 功能选项
+### 功能選項
 
-功能选项是一种模式，您可以在其中声明一个不透明 Option 类型，该类型在某些内部结构中记录信息。您接受这些选项的可变编号，并根据内部结构上的选项记录的全部信息采取行动。
+功能選項是一種模式，您可以在其中宣告一個不透明 Option 類型，該類型在某些内部結構中紀錄訊息。您接受這些選項的可變编號，並根據内部結構上的選項紀錄的全部訊息採取行動。
 
-将此模式用于您需要扩展的构造函数和其他公共 API 中的可选参数，尤其是在这些功能上已经具有三个或更多参数的情况下。
+將此模式用於您需要擴展的構造函數和其他公共 API 中的可選参數，尤其是在這些功能上已经具有三個或更多参數的情況下。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -3377,7 +3377,7 @@ func Open(
 </td></tr>
 <tr><td>
 
-必须始终提供缓存和记录器参数，即使用户希望使用默认值。
+必須始终提供缓存和紀錄器参數，即使使用者希望使用預設值。
 
 ```go
 db.Open(addr, db.DefaultCache, zap.NewNop())
@@ -3388,7 +3388,7 @@ db.Open(addr, false /* cache */, log)
 
 </td><td>
 
-只有在需要时才提供选项。
+只有在需要時才提供選項。
 
 ```go
 db.Open(addr)
@@ -3404,7 +3404,7 @@ db.Open(
 </td></tr>
 </tbody></table>
 
-我们建议实现此模式的方法是使用一个 `Option` 接口，该接口保存一个未导出的方法，在一个未导出的 `options` 结构上记录选项。
+我們建議實作此模式的方法是使用一個 `Option` 介面，該介面保存一個未導出的方法，在一個未導出的 `options` 結構上紀錄選項。
 
 ```go
 type options struct {
@@ -3456,9 +3456,9 @@ func Open(
 }
 ```
 
-注意：还有一种使用闭包实现这个模式的方法，但是我们相信上面的模式为作者提供了更多的灵活性，并且更容易对用户进行调试和测试。特别是，在不可能进行比较的情况下它允许在测试和模拟中对选项进行比较。此外，它还允许选项实现其他接口，包括 `fmt.Stringer`，允许用户读取选项的字符串表示形式。
+注意：還有一種使用閉包實作這個模式的方法，但是我們相信上面的模式為作者提供了更多的靈活性，並且更容易對使用者進行調試和測試。特別是，在不可能進行比較的情況下它允許在測試和模拟中對選項進行比較。此外，它還允許選項實作其他介面，包括 `fmt.Stringer`，允許使用者讀取選項的字串表示形式。
 
-还可以参考下面资料：
+還可以参考下面資料：
 
 - [Self-referential functions and the design of options]
 - [Functional options for friendly APIs]
@@ -3471,15 +3471,15 @@ use one vs other -->
 
 ## Linting
 
-比任何 "blessed" linter 集更重要的是，lint 在一个代码库中始终保持一致。
+比任何 "blessed" linter 集更重要的是，lint 在一個函式庫中始终保持一致。
 
-我们建议至少使用以下 linters，因为我认为它们有助于发现最常见的问题，并在不需要规定的情况下为代码质量建立一个高标准：
+我們建議至少使用以下 linters，因為我認為它們有助於發現最常見的問題，並在不需要规定的情況下為程式碼質量建立一個高標準：
 
-- [errcheck] 以确保错误得到处理
-- [goimports] 格式化代码和管理 imports
-- [golint] 指出常见的文体错误
-- [govet] 分析代码中的常见错误
-- [staticcheck] 各种静态分析检查
+- [errcheck] 以確保錯誤得到處理
+- [goimports] 格式化程式碼和管理 imports
+- [golint] 指出常見的文體錯誤
+- [govet] 分析程式碼中的常見錯誤
+- [staticcheck] 各種靜態分析檢查
 
   [errcheck]: https://github.com/kisielk/errcheck
   [goimports]: https://godoc.org/golang.org/x/tools/cmd/goimports
@@ -3490,9 +3490,9 @@ use one vs other -->
 
 ### Lint Runners
 
-我们推荐 [golangci-lint] 作为 go-to lint 的运行程序，这主要是因为它在较大的代码库中的性能以及能够同时配置和使用许多规范。这个 repo 有一个示例配置文件 [.golangci.yml] 和推荐的 linter 设置。
+我們推薦 [golangci-lint] 作為 go-to lint 的運作程式，這主要是因為它在較大的函式庫中的性能以及能夠同時配置和使用許多規範。這個 repo 有一個示例配置文件 [.golangci.yml] 和推薦的 linter 設置。
 
-golangci-lint 有 [various-linters] 可供使用。建议将上述 linters 作为基本 set，我们鼓励团队添加对他们的项目有意义的任何附加 linters。
+golangci-lint 有 [various-linters] 可供使用。建議將上述 linters 作為基本 set，我們鼓励团队加入對他們的项目有意義的任何附加 linters。
 
 [golangci-lint]: https://github.com/golangci/golangci-lint
 [.golangci.yml]: https://github.com/uber-go/guide/blob/master/.golangci.yml
@@ -3501,4 +3501,4 @@ golangci-lint 有 [various-linters] 可供使用。建议将上述 linters 作�
 
 ## Stargazers over time
 
-[![Stargazers over time](https://starchart.cc/xxjwxc/uber_go_guide_cn.svg)](https://starchart.cc/xxjwxc/uber_go_guide_cn)
+[![Stargazers over time](https://starchart.cc/ianchen0119/uber_go_guide_tw.svg)](https://starchart.cc/ianchen0119/uber_go_guide_tw)
