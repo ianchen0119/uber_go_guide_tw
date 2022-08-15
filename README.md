@@ -81,7 +81,7 @@ row before the </tbody></table> line.
   - [在邊界處複製 Slices 和 Maps](#在邊界處複製-slices-和-maps)
     - [接收 Slices 和 Maps](#接收-slices-和-maps)
     - [返回 slices 或 maps](#返回-slices-或-maps)
-  - [使用 defer 释放資源](#使用-defer-释放資源)
+  - [使用 defer 釋放資源](#使用-defer-釋放資源)
   - [Channel 的 size 要麽是 1，不然就是無暫存的](#channel-的-size-要麽是-1不然就是無暫存的)
   - [枚舉從 1 開始](#枚舉從-1-開始)
   - [使用 time 處理時間](#使用-time-處理時間)
@@ -521,7 +521,7 @@ func (s *Stats) Snapshot() map[string]int {
   return s.counters
 }
 
-// snapshot 不再受互斥锁保護
+// snapshot 不再受互斥鎖保護
 // 因此對 snapshot 的任何存取都將受到 race condition 影響
 // 影響 stats.counters
 snapshot := stats.Snapshot()
@@ -554,9 +554,9 @@ snapshot := stats.Snapshot()
 </td></tr>
 </tbody></table>
 
-### 使用 defer 释放資源
+### 使用 defer 釋放資源
 
-使用 defer 释放資源，諸如文件和锁。
+使用 defer 釋放資源，諸如文件和鎖。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
