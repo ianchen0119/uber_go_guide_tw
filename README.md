@@ -145,7 +145,7 @@ row before the </tbody></table> line.
 
 ## 介绍
 
-樣式 (style) 是支配我們程式碼的慣例。術語`樣式`有點用詞不當，因為這些约定涵蓋的範圍不限於由 gofmt 替我們處理的原始程式碼格式。
+樣式 (style) 是支配我們程式碼的慣例。術語`樣式`有點用詞不當，因為這些約定涵蓋的範圍不限於由 gofmt 替我們處理的原始程式碼格式。
 
 本指南的目的是通過詳細描述在 Uber 撰寫 Go 程式碼的注意事項來管理這種複雜性。這些規則的存在是為了使函式庫易於管理，同時仍然允許工程師更有效地使用 Go 語言功能。
 
@@ -154,7 +154,7 @@ row before the </tbody></table> line.
 [Prashant Varanasi]: https://github.com/prashantv
 [Simon Newton]: https://github.com/nomis52
 
-本文件紀錄了我們在 Uber 遵循的 Go 程式碼中的慣用约定。其中許多是 Go 的通用準則，而其他擴展準則依赖於下面外部的指南：
+本文件紀錄了我們在 Uber 遵循的 Go 程式碼中的慣用約定。其中許多是 Go 的通用準則，而其他擴展準則依赖於下面外部的指南：
 
 1. [Effective Go](https://golang.org/doc/effective_go.html)
 2. [Go Common Mistakes](https://github.com/golang/go/wiki/CommonMistakes)
@@ -237,7 +237,7 @@ func (h *Handler) ServeHTTP(
 type Handler struct {
   // ...
 }
-// 用於觸發編譯期的介面的合理性檢查機制
+// 用於觸發編譯時期的介面合理性檢查機制
 // 如果 Handler 沒有實作 http.Handler，會在編譯期報錯
 var _ http.Handler = (*Handler)(nil)
 func (h *Handler) ServeHTTP(
@@ -339,7 +339,7 @@ i = s2Ptr
 //   i = s2Val
 ```
 
-[Effective Go](https://golang.org/doc/effective_go.html) 中有一段關於 [pointers vs. values](https://golang.org/doc/effective_go.html#pointers_vs_values) 的精彩讲解。
+[Effective Go](https://golang.org/doc/effective_go.html) 中有一段關於 [pointers vs. values](https://golang.org/doc/effective_go.html#pointers_vs_values) 的精彩講解。
 
 補充：
 
@@ -350,17 +350,17 @@ i = s2Ptr
   - 指標對象可以使用 值接收器方法集 + 指標接收器方法集
 - 介面的匹配 (或者叫實作)
   - 類型實作了介面的所有方法，叫匹配
-  - 具體的讲，要麽是類型的值方法集匹配介面，要麽是指標方法集匹配介面
+  - 具體的講，要麽是類型的值方法集匹配介面，要麽是指標方法集匹配介面
 
 具體的匹配分兩種：
 
-- 值方法集和介面匹配
+- 值方法（Method）集和介面匹配
   - 给介面變數赋值的不管是值還是指標對象，都 ok，因為都包含值方法集
 - 指標方法集和介面匹配
   - 只能將指標對象赋值给介面變數，因為只有指標方法集和介面匹配
   - 如果將值對象赋值给介面變數，會在編譯期報錯 (會觸發介面合理性檢查機制)
 
-為何 i = s2Val 會報錯，因為值方法集和介面不匹配。
+為何 `i = s2Val` 會報錯，因為值方法集和介面不匹配。
 
 ### 零值 Mutex 是有效的
 
@@ -440,11 +440,11 @@ func (m *SMap) Get(k string) string {
 </td></tr>
 <tr><td>
 
-`Mutex` 段落， `Lock` 和 `Unlock` 方法是 `SMap` 導出的 API 中不刻意說明的一部分。
+`Mutex` 段落，`Lock` 和 `Unlock` 方法是 `SMap` 導出的 API 中不刻意說明的一部分。
 
  </td><td>
 
-mutex 及其方法是 `SMap` 的實作，對其調用者不可見。
+mutex 及其方法是 `SMap` 的實作，對其使用者來說是不可見的。
 
  </td></tr>
  </tbody></table>
@@ -547,7 +547,7 @@ func (s *Stats) Snapshot() map[string]int {
   return result
 }
 
-// snapshot 現在是一個拷贝
+// snapshot 現在是一個副本
 snapshot := stats.Snapshot()
 ```
 
@@ -602,7 +602,7 @@ Defer 的開銷非常小，只有在您可以證明函數納秒執行時間處�
 
 ### Channel 的 size 要麽是 1，不然就是無暫存的
 
-channel 通常 size 應為 1 或是無暫存的。預設情況下，channel 是無暫存的，其 size 為零。任何其他大小都必須經過嚴格的檢查。我們需要考慮如何確定大小，考慮是什麽阻止了 channel 在高負載下和阻塞寫時的寫入，以及當這種情況發生時系统邏輯有哪些變化。(翻譯解釋：按照原文意思是需要界定通道邊界、競爭條件，以及邏輯 context 梳理)
+channel 通常 size 應為 1 或是無暫存的。預設情況下，channel 是無暫存的，其 size 為零。任何其他大小都必須經過嚴格的檢查。我們需要考慮如何確定大小，考慮是什麽阻止了 channel 在高負載下和阻塞寫時的寫入，以及當這種情況發生時系统邏輯有哪些變化。(翻譯解釋：按照原文意思是需要界定通道邊界、競爭條件，以及邏輯上下文的梳理)
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -626,7 +626,7 @@ c := make(chan int)
 </td></tr>
 </tbody></table>
 
-### 枚舉從1 開始
+### 枚舉從 1 開始
 
 在 Go 中引入枚舉的標準方法是宣告一個自定義類型和一個使用了 iota 的 const 组。由於變數的預設值為 0，因此通常應以非零值開頭枚舉。
 
@@ -696,7 +696,7 @@ const (
 
 #### 使用 `time.Time` 表達瞬時時間
 
-在處理時間的瞬間時使用 [`time.Time`]，在比較、加入或减去時間時使用 `time.Time` 中的方法。
+在處理時間的瞬間時使用 [`time.Time`]，在比較、加入或減去時間時使用 `time.Time` 中的方法。
 
 [`time.Time`]: https://golang.org/pkg/time/#Time
 
@@ -983,7 +983,7 @@ if err := foo.Open("testfile.txt"); err != nil {
 
 - 如果調用者應該可以存取底層錯誤，請使用 `%w`。
    對於大多數包装錯誤，這是一個很好的預設值，
-   但請注意，調用者可能會開始依赖此行為。因此，對於包装錯誤是已知`var`或類型的情況，請將其作為函數契约的一部分進行紀錄和測試。
+   但請注意，調用者可能會開始依赖此行為。因此，對於包装錯誤是已知`var`或類型的情況，請將其作為函數契約的一部分進行紀錄和測試。
 - 使用 `%v` 來混淆底層錯誤。
   調用者將無法匹配它，但如果需要，您可以在將來切换到 `%w`。
 
@@ -1813,9 +1813,9 @@ bytes, err := json.Marshal(Stock{
 </tbody></table>
 
 理論上：
-結構的序列化形式是不同系统之間的契约。
-對序列化表單結構（包括段落名）的更改會破壞此约定。在標記中指定段落名使约定明確，
-它還可以通過重構或重命名段落來防止意外違反约定。
+結構的序列化形式是不同系统之間的契約。
+對序列化表單結構（包括段落名）的更改會破壞此約定。在標記中指定段落名使約定明確，
+它還可以通過重構或重命名段落來防止意外違反約定。
 
 ## 性能
 
@@ -2025,7 +2025,7 @@ BenchmarkGood-4   100000000    0.21s
 
 但是最重要的是，**保持一致**.
 
-一致性的程式碼更容易维護、是更合理的、需要更少的学习成本、並且随著新的约定出現或者出現錯誤後更容易移植、更新、修复 bug
+一致性的程式碼更容易维護、是更合理的、需要更少的学习成本、並且随著新的約定出現或者出現錯誤後更容易移植、更新、修复 bug
 
 相反，在一個函式庫中包含多個完全不同或衝突的程式碼風格會導致维護成本開銷、不確定性和認知偏差。所有這些都會直接導致速度降低、程式碼檢查痛苦、而且增加 bug 數量。
 
@@ -2256,7 +2256,7 @@ import (
 
 ### 函數名
 
-我們遵循 Go 社群關於使用 [MixedCaps 作為函數名] 的约定。有一個例外，為了對相關的測試用例進行分组，函數名可能包含底線，如：`TestMyFunction_WhatIsBeingTested`.
+我們遵循 Go 社群關於使用 [MixedCaps 作為函數名] 的約定。有一個例外，為了對相關的測試用例進行分组，函數名可能包含底線，如：`TestMyFunction_WhatIsBeingTested`.
 
 [MixedCaps 作為函數名]: https://golang.org/doc/effective_go.html#mixed-caps
 
@@ -3287,7 +3287,7 @@ for _, tt := range tests {
 
 很明顯，使用 test table 的方式在程式碼邏輯擴展的時候，比如新增 test case，都會顯得更加的清晰。
 
-我們遵循這樣的约定：將結構體切片稱為`tests`。 每個測試用例稱為`tt`。此外，我們鼓励使用`give`和`want`前缀說明每個測試用例的輸入和輸出值。
+我們遵循這樣的約定：將結構體切片稱為`tests`。 每個測試用例稱為`tt`。此外，我們鼓励使用`give`和`want`前缀說明每個測試用例的輸入和輸出值。
 
 ```go
 tests := []struct{
