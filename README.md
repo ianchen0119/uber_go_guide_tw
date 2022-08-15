@@ -2521,7 +2521,7 @@ const (
 
 ### 結構體中的嵌入
 
-嵌入式類型（例如 mutex）應位於結構體内的段落 list 的顶部，並且必須有一個空行將嵌入式段落與常规段落分隔開。
+嵌入式類型（例如 mutex）應位於結構體内的段落 list 的顶部，並且必須有一個空行將嵌入式段落與常規段落分隔開。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -3053,7 +3053,7 @@ var user User
 </td></tr>
 </tbody></table>
 
-這將零值結構與那些具有類似於為 [初始化 Maps](#初始化-maps) 建立的，区別於非零值段落的結構区分開來，
+這將零值結構與那些具有類似於為 [初始化 Maps](#初始化-maps) 建立的，區別於非零值段落的結構區分開來，
 並與我們更喜欢的 [宣告空切片] 方式相匹配。
 
 #### 初始化 Struct 引用
@@ -3287,7 +3287,7 @@ for _, tt := range tests {
 
 很明顯，使用 test table 的方式在程式碼邏輯擴展的時候，比如新增 test case，都會顯得更加的清晰。
 
-我們遵循這樣的約定：將結構體切片稱為`tests`。 每個測試用例稱為`tt`。此外，我們鼓励使用`give`和`want`前缀說明每個測試用例的輸入和輸出值。
+我們遵循這樣的約定：將結構體切片稱為`tests`。 每個測試用例稱為`tt`。此外，我們鼓勵使用`give`和`want`前缀說明每個測試用例的輸入和輸出值。
 
 ```go
 tests := []struct{
@@ -3473,11 +3473,11 @@ use one vs other -->
 
 比任何 "blessed" linter 集更重要的是，lint 在一個函式庫中始终保持一致。
 
-我們建議至少使用以下 linters，因為我認為它們有助於發現最常見的問題，並在不需要规定的情況下為程式碼質量建立一個高標準：
+我們建議至少使用以下 linters，因為我認為它們有助於發現最常見的問題，並在不需要規定的情況下為程式碼質量建立一個高標準：
 
 - [errcheck] 以確保錯誤得到處理
 - [goimports] 格式化程式碼和管理 imports
-- [golint] 指出常見的文體錯誤
+- [golint] 指出常見的語法錯誤
 - [govet] 分析程式碼中的常見錯誤
 - [staticcheck] 各種靜態分析檢查
 
@@ -3492,7 +3492,7 @@ use one vs other -->
 
 我們推薦 [golangci-lint] 作為 go-to lint 的運作程式，這主要是因為它在較大的函式庫中的性能以及能夠同時配置和使用許多規範。這個 repo 有一個示例配置文件 [.golangci.yml] 和推薦的 linter 設置。
 
-golangci-lint 有 [various-linters] 可供使用。建議將上述 linters 作為基本 set，我們鼓励团队加入對他們的项目有意義的任何附加 linters。
+golangci-lint 有 [various-linters] 可供使用。建議將上述 linters 作為基本 set，我們鼓勵團隊加入對他們的项目有意義的任何附加 linters。
 
 [golangci-lint]: https://github.com/golangci/golangci-lint
 [.golangci.yml]: https://github.com/uber-go/guide/blob/master/.golangci.yml
