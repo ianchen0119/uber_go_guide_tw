@@ -112,12 +112,12 @@ row before the </tbody></table> line.
 - [規範](#規範)
   - [避免過長的行](#避免過長的行)
   - [一致性](#一致性)
-  - [相似的宣告放在一组](#相似的宣告放在一组)
-  - [import 分组](#import-分组)
+  - [相似的宣告放在一組](#相似的宣告放在一組)
+  - [import 分組](#import-分組)
   - [套件名稱](#套件名稱)
   - [函數名](#函數名)
   - [導入別名](#導入別名)
-  - [函數分组與顺序](#函數分组與顺序)
+  - [函數分組與顺序](#函數分組與顺序)
   - [減少巢套](#減少巢套)
   - [不必要的 else](#不必要的-else)
   - [上層變數宣告](#上層變數宣告)
@@ -628,7 +628,7 @@ c := make(chan int)
 
 ### 枚舉從 1 開始
 
-在 Go 中引入枚舉的標準方法是宣告一個自定義類型和一個使用了 iota 的 const 组。由於變數的預設值為 0，因此通常應以非零值開頭枚舉。
+在 Go 中引入枚舉的標準方法是宣告一個自定義類型和一個使用了 iota 的 const 組。由於變數的預設值為 0，因此通常應以非零值開頭枚舉。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -1364,7 +1364,7 @@ func (l *ConcreteList) Remove(e Entity) {
 </td></tr>
 </tbody></table>
 
-Go 允許 [類型嵌入](https://golang.org/doc/effective_go.html#embedding) 作為继承和组合之間的折衷。外部類型獲取嵌入類型的方法的隐式副本。預設情況下，這些方法委托给嵌入實例的同一方法。
+Go 允許 [類型嵌入](https://golang.org/doc/effective_go.html#embedding) 作為继承和組合之間的折衷。外部類型獲取嵌入類型的方法的隐式副本。預設情況下，這些方法委托给嵌入實例的同一方法。
 
 結構還獲得與類型同名的成員。
 所以，如果嵌入的類型是 public，那麽成員是 public。為了保持向後兼容性，外部類型的每個未來版本都必須保留嵌入類型。
@@ -2031,9 +2031,9 @@ BenchmarkGood-4   100000000    0.21s
 
 將這些標準應用於函式庫時，建議在 package（或更大）等級進行更改，子套件等級的應用程式通過將多個樣式引入到同一程式碼中，違反了上述關注點。
 
-### 相似的宣告放在一组
+### 相似的宣告放在一組
 
-Go 語言支持將相似的宣告放在一個组内。
+Go 語言支持將相似的宣告放在一個組内。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -2098,7 +2098,7 @@ type (
 </td></tr>
 </tbody></table>
 
-僅將相關的宣告放在一组。不要將不相關的宣告放在一组。
+僅將相關的宣告放在一組。不要將不相關的宣告放在一組。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -2133,7 +2133,7 @@ const EnvVar = "MY_ENV"
 </td></tr>
 </tbody></table>
 
-分组使用的位置沒有限制，例如：你可以在函數内部使用它們：
+分組使用的位置沒有限制，例如：你可以在函數内部使用它們：
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -2167,7 +2167,7 @@ func f() string {
 </td></tr>
 </tbody></table>
 
-例外：如果變數宣告與其他變數相鄰，則應將變數宣告（尤其是函數内部的宣告）分组在一起。對一起宣告的變數納秒執行此操作，即使它們不相關。
+例外：如果變數宣告與其他變數相鄰，則應將變數宣告（尤其是函數内部的宣告）分組在一起。對一起宣告的變數納秒執行此操作，即使它們不相關。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -2201,14 +2201,14 @@ func (c *client) request() {
 </td></tr>
 </tbody></table>
 
-### import 分组
+### import 分組
 
-導入應該分為兩组：
+導入應該分為兩組：
 
 - 標準函式庫
 - 其他函式庫
 
-預設情況下，這是 goimports 應用的分组。
+預設情況下，這是 goimports 應用的分組。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -2256,7 +2256,7 @@ import (
 
 ### 函數名
 
-我們遵循 Go 社群關於使用 [MixedCaps 作為函數名] 的約定。有一個例外，為了對相關的測試用例進行分组，函數名可能包含底線，如：`TestMyFunction_WhatIsBeingTested`.
+我們遵循 Go 社群關於使用 [MixedCaps 作為函數名] 的約定。有一個例外，為了對相關的測試用例進行分組，函數名可能包含底線，如：`TestMyFunction_WhatIsBeingTested`.
 
 [MixedCaps 作為函數名]: https://golang.org/doc/effective_go.html#mixed-caps
 
@@ -2304,16 +2304,16 @@ import (
 </td></tr>
 </tbody></table>
 
-### 函數分组與顺序
+### 函數分組與顺序
 
 - 函數應按粗略的調用顺序排序。
-- 同一文件中的函數應按接收者分组。
+- 同一文件中的函數應按接收者分組。
 
 因此，導出的函數應先出現在文件中，放在`struct`, `const`, `var`定義的後面。
 
 在定義類型之後，但在接收者的其餘方法之前，可能會出現一個 `newXYZ()`/`NewXYZ()`
 
-由於函數是按接收者分组的，因此普通工具函數應在文件末尾出現。
+由於函數是按接收者分組的，因此普通工具函數應在文件末尾出現。
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -3157,7 +3157,7 @@ m := map[T1]T2{
 </td></tr>
 </tbody></table>
 
-基本準則是：在初始化時使用 map 初始化 list  來加入一组固定的元素。否則使用 `make` (如果可以，請盡量指定 map 容量)。
+基本準則是：在初始化時使用 map 初始化 list  來加入一組固定的元素。否則使用 `make` (如果可以，請盡量指定 map 容量)。
 
 ### 字串 string format
 
