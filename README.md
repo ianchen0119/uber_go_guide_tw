@@ -818,7 +818,7 @@ type Config struct {
 [`Time.UnmarshalText`]: https://golang.org/pkg/time/#Time.UnmarshalText
 [`time.RFC3339`]: https://golang.org/pkg/time/#RFC3339
 
-儘管這在實践中並不成問題，但請記住，`"time"` 套件不支持解析閏秒時間戳（[8728]），也不在計算中考慮閏秒（[15190]）。如果您比較兩個時間瞬間，則差异將不包括這兩個瞬間之間可能發生的閏秒。
+儘管這在實務中並不成問題，但請記住，`"time"` 套件不支持解析閏秒時戳（[8728]），也不在計算中考慮閏秒（[15190]）。如果您比較兩個時間瞬間，則差異將不包括這兩個瞬間之間可能發生的閏秒。
 
 [8728]: https://github.com/golang/go/issues/8728
 [15190]: https://github.com/golang/go/issues/15190
