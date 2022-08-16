@@ -690,7 +690,7 @@ const (
 
 例如，*1* 表示在一個時間點上加上 24 小時並不總是產生一個新的日曆日。
 
-因此，在處理時間時始终使用 [`"time"`] 包，因為它有助於以更安全、更準確的方式處理這些不正確的假設。
+因此，在處理時間時始终使用 [`"time"`] 套件，因為它有助於以更安全、更準確的方式處理這些不正確的假設。
 
 [`"time"`]: https://golang.org/pkg/time/
 
@@ -959,8 +959,8 @@ if err := foo.Open("testfile.txt"); err != nil {
 </td></tr>
 </tbody></table>
 
-請注意，如果您從包中導出錯誤變數或類型，
-它們將成為包的公共 API 的一部分。
+請注意，如果您從套件中導出錯誤變數或類型，
+它們將成為套件的公共 API 的一部分。
 
 #### 錯誤封裝
 
@@ -1043,7 +1043,7 @@ x: y: new store: the error
 
 ```go
 var (
-  // 導出以下兩個錯誤，以便此包的使用者可以將它們與 errors.Is 進行匹配。
+  // 導出以下兩個錯誤，以便此套件的使用者可以將它們與 errors.Is 進行匹配。
 
   ErrBrokenLink = errors.New("link is broken")
   ErrCouldNotOpen = errors.New("could not open")
@@ -1057,7 +1057,7 @@ var (
 對於自定義錯誤的類型，請改用後缀 `Error`。
 
 ```go
-// 同樣，這個錯誤被導出，以便這個包的使用者可以將它與 errors.As 匹配。
+// 同樣，這個錯誤被導出，以便這個套件的使用者可以將它與 errors.As 匹配。
 
 type NotFoundError struct {
   File string
@@ -1067,7 +1067,7 @@ func (e *NotFoundError) Error() string {
   return fmt.Sprintf("file %q not found", e.File)
 }
 
-// 並且這個錯誤沒有被導出，因為我們不想讓它成為公共 API 的一部分。 我們仍然可以在帶有 errors.As 的包中使用它。
+// 並且這個錯誤沒有被導出，因為我們不想讓它成為公共 API 的一部分。 我們仍然可以在帶有 errors.As 的套件中使用它。
 type resolveError struct {
   Path string
 }
@@ -1193,7 +1193,7 @@ if err != nil {
 
 ### 使用 go.uber.org/atomic
 
-使用 [sync/atomic] 包的原子操作對原始類型 (`int32`, `int64`等）進行操作，因為很容易忘記使用原子操作來讀取或修改變數。
+使用 [sync/atomic] 套件的原子操作對原始類型 (`int32`, `int64`等）進行操作，因為很容易忘記使用原子操作來讀取或修改變數。
 
 [go.uber.org/atomic] 通過隐藏基礎類型為這些操作增加了類型安全性。此外，它包括一個方便的`atomic.Bool`類型。
 
@@ -2241,7 +2241,7 @@ import (
 
 ### 套件名稱
 
-當命名包時，請按下面規則選擇一個名稱：
+當命名套件時，請按下面規則選擇一個名稱：
 
 - 全部小寫。沒有大寫或底線。
 - 大多數使用命名導入的情況下，不需要重命名。
