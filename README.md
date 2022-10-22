@@ -62,7 +62,7 @@ row before the </tbody></table> line.
 
  ## 版本
 
-  - 目前版本：[[2022-05-25] commit:#150](https://github.com/uber-go/guide/commit/6e7643ee10e8808b9088e3f3f96f6e499c1be0ca)
+  - 目前版本：[[2022-10-19] commit:#158](https://github.com/uber-go/guide/commit/4478e672bddf9d4f7ca4a561ab0779e08e469577)
   - 如果讀者發現原版本有任何更新、問題與內容的改進，歡迎大家幫忙貢獻到此專案中。
 
 ## 目錄
@@ -103,6 +103,9 @@ row before the </tbody></table> line.
   - [主函數退出方式 (Exit)](#主函數退出方式-exit)
     - [一次性退出](#一次性退出)
   - [在序列化結構中使用成員標記](#在序列化結構中使用成員標記)
+  - [不要一勞永逸的使用 goroutine](#不要一勞永逸的使用-goroutine)
+    - [等待 goroutines 退出](#等待-goroutines-退出)
+    - [不要在 `init()` 使用 goroutines](#不要在-init-使用-goroutines)
 - [性能](#性能)
   - [優先使用 strconv 而不是 fmt](#優先使用-strconv-而不是-fmt)
   - [避免字串到字元的轉換](#避免字串到字元的轉換)
@@ -1173,7 +1176,7 @@ var _statusTemplate = template.Must(template.New("name").Parse("_statusHTML"))
 ```go
 // func TestFoo(t *testing.T)
 
-f, err := ioutil.TempFile("", "test")
+f, err := os.CreateTemp("", "test")
 if err != nil {
   panic("failed to set up test")
 }
@@ -1184,7 +1187,7 @@ if err != nil {
 ```go
 // func TestFoo(t *testing.T)
 
-f, err := ioutil.TempFile("", "test")
+f, err := os.CreateTemp("", "test")
 if err != nil {
   t.Fatal("failed to set up test")
 }
@@ -1567,7 +1570,7 @@ func init() {
     // Bad: 基於當前目錄
     cwd, _ := os.Getwd()
     // Bad: I/O
-    raw, _ := ioutil.ReadFile(
+    raw, _ := os.ReadFile(
         path.Join(cwd, "config", "config.yaml"),
     )
     yaml.Unmarshal(raw, &_config)
@@ -1583,7 +1586,7 @@ type Config struct {
 func loadConfig() Config {
     cwd, err := os.Getwd()
     // handle err
-    raw, err := ioutil.ReadFile(
+    raw, err := os.ReadFile(
         path.Join(cwd, "config", "config.yaml"),
     )
     // handle err
@@ -1675,7 +1678,7 @@ func readFile(path string) string {
   if err != nil {
     log.Fatal(err)
   }
-  b, err := ioutil.ReadAll(f)
+  b, err := os.ReadAll(f)
   if err != nil {
     log.Fatal(err)
   }
@@ -1698,7 +1701,7 @@ func readFile(path string) (string, error) {
   if err != nil {
     return "", err
   }
-  b, err := ioutil.ReadAll(f)
+  b, err := os.ReadAll(f)
   if err != nil {
     return "", err
   }
@@ -1739,7 +1742,7 @@ func main() {
   defer f.Close()
   // 如果我們調用 log.Fatal 在這條線之後
   // f.Close 將會被納秒執行。
-  b, err := ioutil.ReadAll(f)
+  b, err := os.ReadAll(f)
   if err != nil {
     log.Fatal(err)
   }
@@ -1767,7 +1770,7 @@ func run() error {
     return err
   }
   defer f.Close()
-  b, err := ioutil.ReadAll(f)
+  b, err := os.ReadAll(f)
   if err != nil {
     return err
   }
@@ -1820,6 +1823,185 @@ bytes, err := json.Marshal(Stock{
 結構的序列化形式是不同系统之間的契約。
 對序列化表單結構（包括成員名）的更改會破壞此約定。在標記中指定成員名使約定明確，
 它還可以通過重構或重命名成員來防止意外違反約定。
+
+
+### 不要一勞永逸的使用 goroutine
+
+Goroutines 是輕量級的資源，但並非完全不需要開銷。
+至少，它們會在 Stack 以及 CPU 的排程上消耗資源。
+雖然這些成本對於 goroutines 來說很小，但當它們不受生命週期的管控，在大量的情況下會拖累整體效能。
+此外，不受管理的 goroutines 可能會造成其他問題，像是讓 GC 無法回收不再使用的資源。
+
+因此，不要在生產環境中的程式內洩漏 goroutines。
+使用 [go.uber.org/goleak](https://pkg.go.dev/go.uber.org/goleak) 來測試可能產生 goroutine 的洩漏問題。
+
+一般來說，每個 goroutine 必須：
+- 具備可預測的停止運作時間；或者
+- 具有一個方法可以使 goroutine 在接收訊號時停止執行
+
+在這兩種情況下，都必須有一種方法使程式處於 blocking 狀態直到 goroutine 完成工作。
+
+舉例來說：
+
+<table>
+<thead><tr><th>Bad</th><th>Good</th></tr></thead>
+<tbody>
+<tr><td>
+
+```go
+go func() {
+  for {
+    flush()
+    time.Sleep(delay)
+  }
+}()
+```
+
+</td><td>
+
+```go
+var (
+  stop = make(chan struct{}) // 告訴 goroutine 停止
+  done = make(chan struct{}) // 告訴我們 goroutine 退出了
+)
+go func() {
+  defer close(done)
+  ticker := time.NewTicker(delay)
+  defer ticker.Stop()
+  for {
+    select {
+    case <-tick.C:
+      flush()
+    case <-stop:
+      return
+    }
+  }
+}()
+// 其它...
+close(stop)  // 指示 goroutine 停止
+<-done       // 並且等待它停止後離開
+```
+
+</td></tr>
+<tr><td>
+
+若沒有辦法阻止這個 goroutine。它將運作到應用程式退出為止。
+
+</td><td>
+
+這個 goroutine 可以使用 `close(stop)`,
+我們可以等待它退出 `<-done`.
+
+</td></tr>
+</tbody></table>
+
+#### 等待 goroutines 退出
+
+給定一個由系統產生的 goroutine，
+必須有一種方式能等待 goroutine 退出。
+這邊有兩種常見的方式：
+
+- 使用 `sync.WaitGroup`.
+  如果您要等待多個 goroutine，請執行此方式：
+
+    ```go
+    var wg sync.WaitGroup
+    for i := 0; i < N; i++ {
+      wg.Add(1)
+      go func() {
+        defer wg.Done()
+        // ...
+      }()
+    }
+    
+    // To wait for all to finish:
+    wg.Wait()
+    ```
+
+- 新增另一個 `chan struct{}`，goroutine 結束執行時會關閉它。
+   如果只有一個 goroutine，請執行此方式：
+
+    ```go
+    done := make(chan struct{})
+    go func() {
+      defer close(done)
+      // ...
+    }()
+    
+    // To wait for the goroutine to finish:
+    <-done
+    ```
+
+#### 不要在 `init()` 使用 goroutines 
+
+`init()` 函式不應該產生 goroutines。
+可以參考 [避免使用 init()](#避免使用-init)。
+
+如果一個套件需要一個背景執行的 goroutine，
+它必須公開一個負責管理 goroutine 生命週期的物件。
+該物件必須提供一個方法（`Close`、`Stop`、`Shutdown` 等）來指示背景 goroutine 停止並等待它的退出。
+
+<table>
+<thead><tr><th>Bad</th><th>Good</th></tr></thead>
+<tbody>
+<tr><td>
+
+```go
+func init() {
+  go doWork()
+}
+func doWork() {
+  for {
+    // ...
+  }
+}
+```
+
+</td><td>
+
+```go
+type Worker struct{ /* ... */ }
+func NewWorker(...) *Worker {
+  w := &Worker{
+    stop: make(chan struct{}),
+    done: make(chan struct{}),
+    // ...
+  }
+  go w.doWork()
+}
+func (w *Worker) doWork() {
+  defer close(w.done)
+  for {
+    // ...
+    case <-w.stop:
+      return
+  }
+}
+// Shutdown 告訴 worker 停止
+// 並等待它完成。
+func (w *Worker) Shutdown() {
+  close(w.stop)
+  <-w.done
+}
+```
+
+</td></tr>
+<tr><td>
+
+當使用者導出這個套件時，將無條件的產生一個背景 goroutine。
+使用者無法控制 goroutine 或是停止它。
+
+</td><td>
+
+仅当用户请求时才生成工作人员。
+提供一种关闭工作器的方法，以便用户可以释放工作器使用的资源。
+
+請注意，如果開發人員需要管理多個 goroutines，則應該使用 `WaitGroup`。
+請參考 [等待 goroutines 退出](#等待-goroutines-退出)。
+
+
+</td></tr>
+</tbody></table>
 
 ## 性能
 
@@ -1932,7 +2114,7 @@ make(map[T1]T2, hint)
 ```go
 m := make(map[string]os.FileInfo)
 
-files, _ := ioutil.ReadDir("./files")
+files, _ := os.ReadDir("./files")
 for _, f := range files {
     m[f.Name()] = f
 }
@@ -1942,7 +2124,7 @@ for _, f := range files {
 
 ```go
 
-files, _ := ioutil.ReadDir("./files")
+files, _ := os.ReadDir("./files")
 
 m := make(map[string]os.FileInfo, len(files))
 for _, f := range files {
@@ -2822,7 +3004,7 @@ func f(list []int) {
 <tr><td>
 
 ```go
-err := ioutil.WriteFile(name, data, 0644)
+err := os.WriteFile(name, data, 0644)
 if err != nil {
  return err
 }
@@ -2831,7 +3013,7 @@ if err != nil {
 </td><td>
 
 ```go
-if err := ioutil.WriteFile(name, data, 0644); err != nil {
+if err := os.WriteFile(name, data, 0644); err != nil {
  return err
 }
 ```
@@ -2847,7 +3029,7 @@ if err := ioutil.WriteFile(name, data, 0644); err != nil {
 <tr><td>
 
 ```go
-if data, err := ioutil.ReadFile(name); err == nil {
+if data, err := os.ReadFile(name); err == nil {
   err = cfg.Decode(data)
   if err != nil {
     return err
@@ -2863,7 +3045,7 @@ if data, err := ioutil.ReadFile(name); err == nil {
 </td><td>
 
 ```go
-data, err := ioutil.ReadFile(name)
+data, err := os.ReadFile(name)
 if err != nil {
    return err
 }
