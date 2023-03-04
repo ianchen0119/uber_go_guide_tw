@@ -294,17 +294,18 @@ func (s *S) Write(str string) {
   s.data = str
 }
 
+// 我們無法獲取存儲在映射中的值的指針，因為它們不是具有位址的值
 sVals := map[int]S{1: {"A"}}
 
-// 透過數值，只能呼叫 Read
+// 我們可以對儲存在 map 中的值呼叫 Read 方法，因為 Read 方法是使用值接收者，不需要將值取出其地址。
 sVals[1].Read()
 
-// 無法編譯通過：
+// 我們無法對儲存在 map 中的值呼叫 Write，因為 Write 需要指針接收器，而無法獲取儲存在 map 中的值的指針。
 //  sVals[1].Write("test")
 
 sPtrs := map[int]*S{1: {"A"}}
 
-// 透過指標既可以呼叫 Read，也可以呼叫 Write 方法
+// 如果 map 存儲的是指針，則可以呼叫 Read 和 Write，因為指針本身是具有位址的
 sPtrs[1].Read()
 sPtrs[1].Write("test")
 ```
