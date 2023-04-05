@@ -62,7 +62,7 @@ row before the </tbody></table> line.
 
 ## 版本
 
-- 目前版本：[[2023-03-04] commit:#170](https://github.com/uber-go/guide/commit/ac884febde0af5dc6821949de4cf3e921cef7a3d)
+- 目前版本：[[2023-03-22] commit:#176](https://github.com/uber-go/guide/commit/a61a8f5fb464715f196a2040afe744f7766ae91b)
 - 如果讀者發現原版本有任何更新、問題與內容的改進，歡迎大家幫忙貢獻到此專案中
 
 ## 目錄
@@ -294,19 +294,25 @@ func (s *S) Write(str string) {
   s.data = str
 }
 
-// 我們無法獲取存儲在映射中的值的指針，因為它們不是具有位址的值
+// 我們無法取得儲存在 map 中的值的指標，因為它們不是可尋址的數值
 sVals := map[int]S{1: {"A"}}
 
-// 我們可以對儲存在 map 中的值呼叫 Read 方法，因為 Read 方法是使用值接收者，不需要將值取出其地址。
+// 我們可以對儲存在 map 中的值呼叫 Read 方法，
+// 因為 Read 方法是使用數值接受器，其不要求
+// 數值是可以尋址的。
 sVals[1].Read()
 
-// 我們無法對儲存在 map 中的值呼叫 Write，因為 Write 需要指針接收器，而無法獲取儲存在 map 中的值的指針。
+// 我們不能對儲存在 map 中的值呼叫 Write 方法，
+// 因為 Write 方法是使用指標接收器，其無法
+// 取得儲存在 map 中的值的指標。
+//
 //  sVals[1].Write("test")
 
 sPtrs := map[int]*S{1: {"A"}}
 
-// 如果 map 存儲的是指針，則可以呼叫 Read 和 Write，因為指針本身是具有位址的
-sPtrs[1].Read()
+// 如果 map 儲存的是指標，則可以呼叫 Read 和 Write，
+// 因為指標本身就可以尋址。
+sPtrs[1].Read
 sPtrs[1].Write("test")
 ```
 
