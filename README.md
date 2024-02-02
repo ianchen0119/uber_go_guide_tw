@@ -62,7 +62,7 @@ row before the </tbody></table> line.
 
 ## 版本
 
-- 目前版本：[[2023-03-22] commit:#176](https://github.com/uber-go/guide/commit/a61a8f5fb464715f196a2040afe744f7766ae91b)
+- 目前版本：[[2023-04-11] commit:#179](https://github.com/uber-go/guide/commit/42f94b614a8c353bd0ffed62d558061bcef9e64c)
 - 如果讀者發現原版本有任何更新、問題與內容的改進，歡迎大家幫忙貢獻到此專案中
 
 ## 目錄
@@ -92,6 +92,7 @@ row before the </tbody></table> line.
     - [錯誤的類型](#錯誤的類型)
     - [錯誤封裝](#錯誤封裝)
     - [錯誤命名](#錯誤命名)
+    - [一次性處理 Errors](#一次性處理-Errors)
   - [處理斷言失敗](#處理斷言失敗)
   - [不要使用 panic](#不要使用-panic)
   - [使用 go.uber.org/atomic](#使用-gouberorgatomic)
@@ -1071,6 +1072,100 @@ func (e *resolveError) Error() string {
   return fmt.Sprintf("resolve %q", e.Path)
 }
 ```
+
+### 一次性處理 Errors
+
+當 Caller 收到來自 Callee 回傳的錯誤，可以根據不同的情況對它進行不同的處理：
+- 如果 Callee 定義了特定錯誤，令錯誤與 `errors.Is` 或 `errors.As` 相匹配。
+- 若錯誤是可以被處理的，則將它正確的處理並降級。
+- 若錯誤符合特定範圍的錯誤條件，則返回定義明確的錯誤。
+- 回傳錯誤，無論是 [Wrap](#錯誤封裝) 或是 Verbatim（逐字的）。
+
+無論 Caller 如何處理錯誤，它通常應該只處理每個錯誤一次。
+例如：Caller 不應該記錄錯誤然後返回它，因為其 Caller 也可以處理該錯誤。
+
+舉例來說，讓我們考慮以下情況：
+
+<table>
+<thead><tr><th>描述</th><th>Code</th></tr></thead>
+<tbody>
+<tr><td>
+
+**不妥做法**: 紀錄錯誤並將其返回
+
+若非最終的 Caller，則不應該這樣處理錯誤（紀錄錯誤並將其返回）。
+這麼做會讓應用程式在運作時有過多的雜訊。
+
+</td><td>
+
+```go
+u, err := getUser(id)
+if err != nil {
+  // BAD: See description
+  log.Printf("Could not get user %q: %v", id, err)
+  return err
+}
+```
+
+</td></tr>
+<tr><td>
+
+**較佳做法**: 封裝錯誤並將其返回
+
+Callers further up the stack will handle the error.
+上層的 Caller 會處理這筆錯誤，使用 `%w` 保證它能夠被  `errors.Is` 或是 `errors.As` 匹配。
+
+</td><td>
+
+```go
+u, err := getUser(id)
+if err != nil {
+  return fmt.Errorf("get user %q: %w", id, err)
+}
+```
+
+</td></tr>
+<tr><td>
+
+**較佳做法**: 紀錄錯誤並降級處理
+
+如果這個操作是非必要的，我們可以將其降級並利用 `recover`，這樣一來便不會讓應用程式中斷。
+
+</td><td>
+
+```go
+if err := emitMetrics(); err != nil {
+  // Failure to write metrics should not
+  // break the application.
+  log.Printf("Could not emit metrics: %v", err)
+}
+
+```
+
+</td></tr>
+<tr><td>
+
+**較佳做法**: Match the error and degrade gracefully
+
+若是 Call 定義了特別的錯誤，並且該錯誤屬於可還原的，我們可以在 Caller 對其進行正確的處理（degrade）。
+對於無法 degrade 的錯誤，則直接將其返回。
+
+</td><td>
+
+```go
+tz, err := getUserTimeZone(id)
+if err != nil {
+  if errors.Is(err, ErrUserNotFound) {
+    // User doesn't exist. Use UTC.
+    tz = time.UTC
+  } else {
+    return fmt.Errorf("get user %q: %w", id, err)
+  }
+}
+```
+
+</td></tr>
+</tbody></table>
 
 ### 處理斷言失敗
 
